@@ -1,0 +1,107 @@
+body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background-color: #fffaf0; /* bg-orange-50 (Floral White - a very light warm neutral) */
+    color: #262626; /* text-neutral-800 */
+    scroll-behavior: smooth;
+}
+
+.chart-container {
+    position: relative;
+    width: 100%;
+    max-width: 500px; /* Adjusted for radar and bar charts */
+    margin-left: auto;
+    margin-right: auto;
+    height: 300px; /* Tailwind: h-72 */
+}
+
+@media (min-width: 768px) {
+    .chart-container {
+        height: 350px; /* Tailwind: h-80 approx */
+         max-width: 600px;
+    }
+}
+
+.section-card {
+    background-color: white;
+    border-radius: 0.75rem; /* rounded-xl */
+    padding: 1.5rem; /* p-6 */
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); /* shadow-lg */
+    margin-bottom: 2rem; /* mb-8 */
+}
+
+.sticky-nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: rgba(255, 250, 240, 0.8); /* bg-orange-50 with opacity */
+    backdrop-filter: blur(10px);
+}
+
+.nav-link {
+    color: #b45309; /* amber-700 */
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #a16207; /* amber-600 */
+}
+
+h1, h2, h3 {
+    color: #b45309; /* amber-700 */
+}
+
+.accent-1 { color: #d97706; } /* amber-500 */
+.accent-2 { color: #65a30d; } /* lime-600 */
+.accent-3 { color: #0284c7; } /* sky-600 */
+.accent-4 { color: #8b5cf6; } /* violet-500 for D new */
+.accent-5 { color: #ec4899; } /* pink-500 for E new (from old E) */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #d4d4d4; /* neutral-300 */
+    padding: 0.5rem; /* p-2 */
+    text-align: center;
+}
+
+th {
+    background-color: #f5f5f5; /* neutral-100 */
+}
+
+.category-icon {
+    font-size: 2rem; /* text-3xl */
+    margin-bottom: 0.5rem; /* mb-2 */
+}
+
+.question-group {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: #fdfaf5; /* Lighter than body bg */
+    border-left: 4px solid #fcd34d; /* amber-300 */
+    border-radius: 0.5rem;
+}
+
+.question-group h4 {
+    color: #d97706; /* amber-500 */
+    margin-bottom: 0.75rem;
+}
+
+.question-item {
+    margin-bottom: 0.75rem;
+    padding: 0.5rem;
+    background-color: #ffffff;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+}
+
+.radio-label {
+    margin-left: 0.5rem;
+    cursor: pointer;
+}
+
+.radio-input {
+    cursor: pointer;
+} 

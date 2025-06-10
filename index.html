@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>セキュリティ適職診断ツール解説</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <nav class="sticky-nav shadow-md">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="text-xl font-semibold text-amber-700">適職診断解説</div>
+            <div class="space-x-4">
+                <a href="#purpose" class="nav-link">目的</a>
+                <a href="#mechanism" class="nav-link">仕組み</a>
+                <a href="#categories" class="nav-link">カテゴリ</a>
+                <a href="#profiles" class="nav-link">職種</a>
+                <a href="#diagnosis-tool" class="nav-link">診断を試す</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="bg-amber-100 py-12 text-center">
+        <div class="container mx-auto px-6">
+            <h1 class="text-4xl font-bold mb-4">セキュリティ適職診断ツール解説</h1>
+            <p class="text-lg text-neutral-700">あなたに最適なセキュリティのキャリアを見つけるために</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+
+        <section id="purpose" class="section-card">
+            <h2 class="text-2xl font-bold mb-4">1. 診断の目的</h2>
+            <p class="mb-2">この診断ツールは、セキュリティ業界の多様な職種の中から、個人のスキルや興味に最も合致する「適職」を導き出すことを目的としています。</p>
+            <p>セキュリティ関連の職種は多岐にわたり、それぞれの役割で求められる特性が異なります。この診断を通じて、求職者の方やキャリアチェンジを考えている方が、ご自身の強みを活かせる道を見つけるお手伝いをします。</p>
+        </section>
+
+        <section id="mechanism" class="section-card">
+            <h2 class="text-2xl font-bold mb-4">2. 診断の仕組み（全体像）</h2>
+            <p class="mb-4">診断は以下のステップで進みます。</p>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+                <div class="p-4 bg-sky-50 rounded-lg shadow">
+                    <div class="text-3xl mb-2 accent-3">①</div>
+                    <h3 class="font-semibold text-sky-700 mb-1">質問への回答</h3>
+                    <p class="text-sm text-neutral-600">設定された質問に「はい」または「いいえ」で回答します。</p>
+                </div>
+                <div class="p-4 bg-lime-50 rounded-lg shadow">
+                    <div class="text-3xl mb-2 accent-2">②</div>
+                    <h3 class="font-semibold text-lime-700 mb-1">カテゴリ点数算出</h3>
+                    <p class="text-sm text-neutral-600">5つのスキルカテゴリごとに点数（0～4点）が算出されます。</p>
+                </div>
+                <div class="p-4 bg-amber-50 rounded-lg shadow">
+                     <div class="text-3xl mb-2 accent-1">③</div>
+                    <h3 class="font-semibold text-amber-700 mb-1">配点との照合</h3>
+                    <p class="text-sm text-neutral-600">算出された点数を各職業の理想配点と照合します。</p>
+                </div>
+                <div class="p-4 bg-rose-50 rounded-lg shadow">
+                    <div class="text-3xl mb-2 text-rose-500">④</div>
+                    <h3 class="font-semibold text-rose-700 mb-1">適職の提示</h3>
+                    <p class="text-sm text-neutral-600">最も合致する職業を提示します。</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="categories" class="section-card">
+            <h2 class="text-2xl font-bold mb-6 text-center">3. 診断の核となる5つのスキルカテゴリ</h2>
+            <p class="text-center mb-8 text-neutral-700">診断は、以下の5つの主要なスキルカテゴリに基づいています。各カテゴリには4つの質問があり、「はい」と答えた数（0～4点）がそのカテゴリの点数となります。</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 text-center">
+                <div class="p-4 bg-white rounded-lg shadow-md border border-amber-200">
+                    <div class="category-icon accent-1">💡</div>
+                    <h3 class="font-semibold text-amber-700 mb-1">(A) 探求・分析・問題解決</h3>
+                    <p class="text-xs text-neutral-600">新しい技術の探求、原因究明、論理的分析、情報収集の意欲。</p>
+                </div>
+                <div class="p-4 bg-white rounded-lg shadow-md border border-lime-200">
+                    <div class="category-icon accent-2">💻</div>
+                    <h3 class="font-semibold text-lime-700 mb-1">(B) 開発・構築・実践</h3>
+                    <p class="text-xs text-neutral-600">システム開発、プログラミング、インフラ構築の実務能力。</p>
+                </div>
+                <div class="p-4 bg-white rounded-lg shadow-md border border-sky-200">
+                    <div class="category-icon accent-3">🗣️</div>
+                    <h3 class="font-semibold text-sky-700 mb-1">(C) コミュニケーション</h3>
+                    <p class="text-xs text-neutral-600">チーム連携、対人関係構築、意見の合意形成。</p>
+                </div>
+                <div class="p-4 bg-white rounded-lg shadow-md border border-violet-200">
+                    <div class="category-icon accent-4">📊</div>
+                    <h3 class="font-semibold text-violet-700 mb-1">(D) 戦略・リーダーシップ</h3>
+                    <p class="text-xs text-neutral-600">長期計画立案、チーム統率、リスク管理、主体的な行動推進。</p>
+                </div>
+                <div class="p-4 bg-white rounded-lg shadow-md border border-pink-200">
+                    <div class="category-icon accent-5">🎓</div>
+                    <h3 class="font-semibold text-pink-700 mb-1">(E) 教育</h3>
+                    <p class="text-xs text-neutral-600">専門知識の分かりやすい説明、他者への指導、プレゼンテーション能力。</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="profiles" class="section-card">
+            <h2 class="text-2xl font-bold mb-4">4. あなたに合うのは？職種別スキルプロファイル</h2>
+            <p class="mb-4 text-neutral-700">各セキュリティ職種には、それぞれの業務特性に応じた「理想的なカテゴリ配点」が設定されています。これは、その職業で成功するために、各カテゴリのスキルがどの程度求められるか（「はい」の数）を示しています。以下の表で全体像を確認し、特定の職種をドロップダウンから選択すると、そのスキルプロファイルをレーダーチャートで視覚的に確認できます。</p>
+            <div class="overflow-x-auto mb-6">
+                <table id="jobProfilesTable" class="min-w-full">
+                    <thead>
+                        <tr>
+                            <th>カテゴリ名</th>
+                            <th>CEO</th><th>CISO</th><th>脆弱性診断・ペネトレーションテスト</th><th>SOC/CSIRT</th><th>Security Analysts</th><th>フォレンジクス</th><th>セキュリティーソリューション開発エンジニア</th><th>教育</th><th>営業</th><th>セキュリティコンサルタント</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>(A) 探求・分析・問題解決</td><td>2</td><td>2</td><td>4</td><td>4</td><td>4</td><td>4</td><td>3</td><td>1</td><td>1</td><td>3</td></tr>
+                        <tr><td>(B) 開発・構築・実践</td><td>1</td><td>3</td><td>4</td><td>2</td><td>2</td><td>1</td><td>4</td><td>1</td><td>0</td><td>2</td></tr>
+                        <tr><td>(C) コミュニケーション</td><td>4</td><td>4</td><td>2</td><td>3</td><td>1</td><td>2</td><td>3</td><td>4</td><td>4</td><td>4</td></tr>
+                        <tr><td>(D) 戦略・リーダーシップ</td><td>4</td><td>4</td><td>1</td><td>3</td><td>1</td><td>1</td><td>2</td><td>3</td><td>3</td><td>4</td></tr>
+                        <tr><td>(E) 教育</td><td>3</td><td>3</td><td>1</td><td>2</td><td>1</td><td>1</td><td>2</td><td>4</td><td>1</td><td>3</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-6">
+                <h3 class="text-xl font-semibold mb-3 text-amber-700">職種別スキルプロファイル詳細</h3>
+                <label for="jobSelector" class="block mb-2 text-sm font-medium text-neutral-700">確認したい職種を選択してください:</label>
+                <select id="jobSelector" class="bg-white border border-neutral-300 text-neutral-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5 mb-4">
+                    <option selected value="">-- 職種を選択 --</option>
+                </select>
+                <div class="chart-container mx-auto">
+                    <canvas id="jobProfileChart"></canvas>
+                </div>
+                <p id="jobProfileChartDesc" class="text-sm text-neutral-600 mt-2 text-center">職種を選択すると、ここにスキルプロファイルが表示されます。</p>
+            </div>
+        </section>
+
+        <!-- Section: Take the Diagnosis -->
+        <section id="diagnosis-tool" class="section-card">
+            <h2 class="text-2xl font-bold mb-4">5. 診断を試す</h2>
+            <p class="mb-4 text-neutral-700">ご自身の適性を診断してみましょう！以下の各質問に対し、「はい」または「いいえ」を選択してください。全ての質問に回答後、「診断する」ボタンをクリックすると、あなたのスキルプロファイルとおすすめの職種が表示されます。</p>
+
+            <form id="diagnosisForm" class="space-y-6">
+                <!-- Questions will be dynamically loaded here -->
+            </form>
+
+            <button id="diagnoseButton" class="mt-8 w-full md:w-auto px-6 py-3 bg-amber-500 text-white font-bold rounded-lg shadow-md hover:bg-amber-600 transition duration-300">
+                診断する
+            </button>
+            <button id="resetButton" class="mt-4 w-full md:w-auto px-6 py-3 bg-neutral-300 text-neutral-800 font-bold rounded-lg shadow-md hover:bg-neutral-400 transition duration-300 md:ml-4">
+                リセット
+            </button>
+
+            <div id="diagnosisResult" class="mt-8 p-6 bg-white rounded-lg shadow-inner border border-amber-200 hidden">
+                <h3 class="text-xl font-semibold mb-4 text-amber-700">あなたの診断結果</h3>
+                <p class="mb-4 text-neutral-700">あなたのスキルプロファイルと、最も適性が高いと診断された職種は以下の通りです。</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div>
+                        <p class="text-lg font-medium text-neutral-800 mb-2">あなたのカテゴリ別スコア:</p>
+                        <ul id="userScoresList" class="list-disc list-inside text-neutral-700 mb-4">
+                            <!-- User scores will be listed here -->
+                        </ul>
+                        <p class="text-xl font-bold text-neutral-800">おすすめの職種: <span id="recommendedJob" class="text-amber-700"></span></p>
+                    </div>
+                    <div class="chart-container mx-auto">
+                        <canvas id="userProfileChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-neutral-800 text-neutral-300 py-8 text-center mt-12">
+        <p>&copy; 2024 セキュリティ適職診断プロジェクトチーム</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 
