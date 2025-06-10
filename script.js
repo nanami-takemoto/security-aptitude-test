@@ -1,12 +1,153 @@
+// デバイス検出とレスポンシブ対応
+let isMobile = false;
+let isTablet = false;
+
+// デバイス検出関数
+function detectDevice() {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const screenWidth = window.innerWidth;
+    
+    // モバイルデバイスの検出
+    isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent) || screenWidth <= 768;
+    
+    // タブレットの検出
+    isTablet = screenWidth > 768 && screenWidth <= 1024;
+    
+    // デバイスに応じたクラスをbodyに追加
+    document.body.classList.remove('mobile-device', 'tablet-device', 'desktop-device');
+    if (isMobile) {
+        document.body.classList.add('mobile-device');
+    } else if (isTablet) {
+        document.body.classList.add('tablet-device');
+    } else {
+        document.body.classList.add('desktop-device');
+    }
+    
+    // デバッグ用（開発時のみ）
+    console.log(`デバイス検出: ${isMobile ? 'モバイル' : isTablet ? 'タブレット' : 'デスクトップ'} (${screenWidth}px)`);
+}
+
+// スマホ専用のナビゲーション最適化
+function optimizeMobileNavigation() {
+    if (!isMobile) return;
+    
+    const nav = document.querySelector('.sticky-nav');
+    const navLinks = nav.querySelectorAll('.nav-link');
+    
+    // ナビゲーションリンクを小さくする
+    navLinks.forEach(link => {
+        link.classList.add('text-sm', 'px-2', 'py-1');
+    });
+    
+    // ナビゲーションタイトルを短縮
+    const navTitle = nav.querySelector('.text-xl');
+    if (navTitle) {
+        navTitle.textContent = '適職診断';
+        navTitle.classList.remove('text-xl');
+        navTitle.classList.add('text-lg');
+    }
+}
+
+// スマホ専用のテーブル最適化
+function optimizeMobileTable() {
+    if (!isMobile) return;
+    
+    const table = document.getElementById('jobProfilesTable');
+    if (!table) return;
+    
+    // テーブルを横スクロール可能にする
+    table.classList.add('text-xs');
+    
+    // ヘッダーセルを小さくする
+    const headers = table.querySelectorAll('th');
+    headers.forEach(header => {
+        header.classList.add('text-xs', 'px-1', 'py-1');
+    });
+    
+    // データセルを小さくする
+    const cells = table.querySelectorAll('td');
+    cells.forEach(cell => {
+        cell.classList.add('text-xs', 'px-1', 'py-1');
+    });
+}
+
+// スマホ専用のチャート最適化
+function optimizeMobileCharts() {
+    if (!isMobile) return;
+    
+    // チャートコンテナのサイズを調整
+    const chartContainers = document.querySelectorAll('.chart-container');
+    chartContainers.forEach(container => {
+        container.style.height = '250px';
+        container.style.maxWidth = '100%';
+    });
+}
+
+// スマホ専用のフォーム最適化
+function optimizeMobileForm() {
+    if (!isMobile) return;
+    
+    // 質問グループのパディングを調整
+    const questionGroups = document.querySelectorAll('.question-group');
+    questionGroups.forEach(group => {
+        group.classList.add('p-3');
+        group.classList.remove('p-4');
+    });
+    
+    // 質問アイテムのマージンを調整
+    const questionItems = document.querySelectorAll('.question-item');
+    questionItems.forEach(item => {
+        item.classList.add('mb-2');
+        item.classList.remove('mb-3');
+    });
+}
+
+// スマホ専用のボタン最適化
+function optimizeMobileButtons() {
+    if (!isMobile) return;
+    
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach(button => {
+        button.classList.add('text-sm', 'py-2', 'px-4');
+        button.classList.remove('py-3', 'px-6');
+    });
+}
+
+// レスポンシブ対応の初期化
+function initializeResponsive() {
+    detectDevice();
+    optimizeMobileNavigation();
+    optimizeMobileTable();
+    optimizeMobileCharts();
+    optimizeMobileForm();
+    optimizeMobileButtons();
+}
+
+// ウィンドウリサイズ時の対応
+function handleResize() {
+    const previousMobile = isMobile;
+    const previousTablet = isTablet;
+    
+    detectDevice();
+    
+    // デバイスタイプが変わった場合のみ再最適化
+    if (previousMobile !== isMobile || previousTablet !== isTablet) {
+        location.reload(); // 簡単な実装のため、リロードで対応
+    }
+}
+
 // チャート関連のユーティリティ関数
 function wrapLabels(labels, maxLength = 16) {
+    // スマホの場合は短めに設定
+    const maxLen = isMobile ? 12 : maxLength;
+    
     return labels.map(label => {
-        if (typeof label === 'string' && label.length > maxLength) {
+        if (typeof label === 'string' && label.length > maxLen) {
             const words = label.split(' ');
             let lines = [];
             let currentLine = '';
             words.forEach(word => {
-                if ((currentLine + word).length > maxLength && currentLine.length > 0) {
+                if ((currentLine + word).length > maxLen && currentLine.length > 0) {
                     lines.push(currentLine.trim());
                     currentLine = word + ' ';
                 } else {
@@ -22,7 +163,7 @@ function wrapLabels(labels, maxLength = 16) {
     });
 }
 
-// 共通チャートオプション
+// 共通チャートオプション（スマホ対応）
 const commonChartOptions = (titleText = '') => ({
     responsive: true,
     maintainAspectRatio: false,
@@ -30,14 +171,21 @@ const commonChartOptions = (titleText = '') => ({
         legend: {
             position: 'top',
             labels: {
-                font: { size: 12, family: "'Noto Sans JP', sans-serif" },
-                 color: '#262626'
+                font: { 
+                    size: isMobile ? 10 : 12, 
+                    family: "'Noto Sans JP', sans-serif" 
+                },
+                color: '#262626'
             }
         },
         title: {
             display: !!titleText,
             text: titleText,
-            font: { size: 16, family: "'Noto Sans JP', sans-serif", weight: 'bold' },
+            font: { 
+                size: isMobile ? 14 : 16, 
+                family: "'Noto Sans JP', sans-serif", 
+                weight: 'bold' 
+            },
             color: '#b45309'
         },
         tooltip: {
@@ -51,8 +199,14 @@ const commonChartOptions = (titleText = '') => ({
                     return label;
                 }
             },
-            bodyFont: { family: "'Noto Sans JP', sans-serif" },
-            titleFont: { family: "'Noto Sans JP', sans-serif" }
+            bodyFont: { 
+                size: isMobile ? 10 : 12,
+                family: "'Noto Sans JP', sans-serif" 
+            },
+            titleFont: { 
+                size: isMobile ? 10 : 12,
+                family: "'Noto Sans JP', sans-serif" 
+            }
         }
     }
 });
@@ -109,13 +263,19 @@ function setupJobProfileChart() {
                                 suggestedMin: 0,
                                 suggestedMax: 4,
                                 pointLabels: {
-                                    font: { size: 10, family: "'Noto Sans JP', sans-serif" },
+                                    font: { 
+                                        size: isMobile ? 8 : 10, 
+                                        family: "'Noto Sans JP', sans-serif" 
+                                    },
                                     color: '#262626'
                                 },
                                 ticks: {
                                     stepSize: 1,
                                     backdropColor: 'rgba(255,250,240,0.5)',
-                                    color: '#737373'
+                                    color: '#737373',
+                                    font: {
+                                        size: isMobile ? 8 : 10
+                                    }
                                 },
                                 grid: { color: '#e5e5e5' }
                             }
@@ -289,13 +449,19 @@ function displayUserProfileChart(scores) {
                     suggestedMin: 0,
                     suggestedMax: 4,
                     pointLabels: {
-                        font: { size: 10, family: "'Noto Sans JP', sans-serif" },
+                        font: { 
+                            size: isMobile ? 8 : 10, 
+                            family: "'Noto Sans JP', sans-serif" 
+                        },
                         color: '#262626'
                     },
                     ticks: {
                         stepSize: 1,
                         backdropColor: 'rgba(255,250,240,0.5)',
-                        color: '#737373'
+                        color: '#737373',
+                        font: {
+                            size: isMobile ? 8 : 10
+                        }
                     },
                     grid: { color: '#e5e5e5' }
                 }
@@ -321,10 +487,14 @@ function resetDiagnosis() {
 function setupEventListeners() {
     diagnoseButton.addEventListener('click', calculateDiagnosis);
     resetButton.addEventListener('click', resetDiagnosis);
+    
+    // リサイズイベントリスナー
+    window.addEventListener('resize', handleResize);
 }
 
 // 初期化関数
 function initialize() {
+    initializeResponsive();
     initializeJobSelector();
     setupJobProfileChart();
     setupEventListeners();
