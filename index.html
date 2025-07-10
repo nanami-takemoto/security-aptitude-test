@@ -104,42 +104,9 @@
             </div>
         </section>
 
-        <section id="profiles" class="section-card">
-            <h2 class="text-2xl font-bold mb-4">4. あなたに合うのは？職種別スキルプロファイル</h2>
-            <p class="mb-4 text-neutral-700">各セキュリティ職種には、それぞれの業務特性に応じた「理想的なカテゴリ配点」が設定されています。これは、その職業で成功するために、各カテゴリのスキルがどの程度求められるか（「はい」の数）を示しています。以下の表で全体像を確認し、特定の職種をドロップダウンから選択すると、そのスキルプロファイルをレーダーチャートで視覚的に確認できます。</p>
-            <div class="overflow-x-auto mb-6">
-                <table id="jobProfilesTable" class="min-w-full">
-                    <thead>
-                        <tr>
-                            <th>カテゴリ名</th>
-                            <th>CEO</th><th>CISO</th><th>脆弱性診断・ペネトレーションテスト</th><th>SOC/CSIRT</th><th>Security Analysts</th><th>フォレンジクス</th><th>セキュリティーソリューション開発エンジニア</th><th>教育</th><th>営業</th><th>セキュリティコンサルタント</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>(A) 探求・分析・問題解決</td><td>2</td><td>2</td><td>4</td><td>4</td><td>4</td><td>4</td><td>3</td><td>1</td><td>1</td><td>3</td></tr>
-                        <tr><td>(B) 開発・構築・実践</td><td>1</td><td>3</td><td>4</td><td>2</td><td>2</td><td>1</td><td>4</td><td>1</td><td>0</td><td>2</td></tr>
-                        <tr><td>(C) コミュニケーション</td><td>4</td><td>4</td><td>2</td><td>3</td><td>1</td><td>2</td><td>3</td><td>4</td><td>4</td><td>4</td></tr>
-                        <tr><td>(D) 戦略・リーダーシップ</td><td>4</td><td>4</td><td>1</td><td>3</td><td>1</td><td>1</td><td>2</td><td>3</td><td>3</td><td>4</td></tr>
-                        <tr><td>(E) 教育</td><td>3</td><td>3</td><td>1</td><td>2</td><td>1</td><td>1</td><td>2</td><td>4</td><td>1</td><td>3</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="mt-6">
-                <h3 class="text-xl font-semibold mb-3 text-amber-700">職種別スキルプロファイル詳細</h3>
-                <label for="jobSelector" class="block mb-2 text-sm font-medium text-neutral-700">確認したい職種を選択してください:</label>
-                <select id="jobSelector" class="bg-white border border-neutral-300 text-neutral-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5 mb-4">
-                    <option selected value="">-- 職種を選択 --</option>
-                </select>
-                <div class="chart-container mx-auto">
-                    <canvas id="jobProfileChart"></canvas>
-                </div>
-                <p id="jobProfileChartDesc" class="text-sm text-neutral-600 mt-2 text-center">職種を選択すると、ここにスキルプロファイルが表示されます。</p>
-            </div>
-        </section>
-
         <!-- Section: Take the Diagnosis -->
         <section id="diagnosis-tool" class="section-card">
-            <h2 class="text-2xl font-bold mb-4">5. 診断を試す</h2>
+            <h2 class="text-2xl font-bold mb-4">4. 診断を試す</h2>
             <p class="mb-4 text-neutral-700">ご自身の適性を診断してみましょう！以下の各質問に対し、「はい」または「いいえ」を選択してください。全ての質問に回答後、「診断する」ボタンをクリックすると、あなたのスキルプロファイルとおすすめの職種が表示されます。</p>
 
             <form id="diagnosisForm" class="space-y-6">
