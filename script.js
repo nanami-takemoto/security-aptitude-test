@@ -253,21 +253,67 @@ function renderDiagnosisQuestions() {
         categoryTitle.textContent = category.label;
         groupDiv.appendChild(categoryTitle);
 
-        category.questions.forEach((questionText, index) => {
+        // 備考欄の追加
+        if (category.note) {
+            const noteDiv = document.createElement('p');
+            noteDiv.className = 'text-xs text-neutral-600 mb-3 italic';
+            noteDiv.textContent = category.note;
+            groupDiv.appendChild(noteDiv);
+        }
+
+        // 脚注説明の追加
+        if (category.footnotes && Object.keys(category.footnotes).length > 0) {
+            const footnotesDiv = document.createElement('div');
+            footnotesDiv.className = 'text-xs text-neutral-600 mb-3';
+            Object.keys(category.footnotes).sort((a, b) => Number(a) - Number(b)).forEach(footnoteNum => {
+                const footnoteP = document.createElement('p');
+                footnoteP.className = 'mb-1';
+                footnoteP.innerHTML = `※${footnoteNum} ${category.footnotes[footnoteNum]}`;
+                footnotesDiv.appendChild(footnoteP);
+            });
+            groupDiv.appendChild(footnotesDiv);
+        }
+
+        category.questions.forEach((questionObj, index) => {
             const questionDiv = document.createElement('div');
             questionDiv.className = 'question-item';
             const questionId = `${categoryKey}-${index}`;
 
+            // 質問がオブジェクトの場合はtextプロパティを取得、文字列の場合はそのまま使用
+            let questionText, questionFootnotes = [];
+            if (typeof questionObj === 'object' && questionObj.text) {
+                questionText = questionObj.text;
+                questionFootnotes = questionObj.footnotes || [];
+            } else {
+                questionText = questionObj;
+            }
+
             const questionP = document.createElement('p');
             questionP.className = 'mb-2 text-neutral-800';
             questionP.id = `question-${questionId}`;
-            questionP.textContent = `${index + 1}. ${questionText}`;
+            
+            // 質問文に脚注番号を追加
+            let displayText = `${index + 1}. ${questionText}`;
+            if (questionFootnotes.length > 0) {
+                // 脚注番号を質問文内の特定語句の後に挿入
+                questionFootnotes.forEach((footnoteNum) => {
+                    // 脚注番号1の場合は「競プロ」の後に挿入
+                    if (footnoteNum === 1) {
+                        displayText = displayText.replace('競プロ', `競プロ<sup class="text-xs align-super">※${footnoteNum}</sup>`);
+                    } else {
+                        // 他の脚注番号の場合は最後に追加
+                        displayText += ` <sup class="text-xs align-super">※${footnoteNum}</sup>`;
+                    }
+                });
+            }
+            questionP.innerHTML = displayText;
             questionDiv.appendChild(questionP);
 
             const fieldset = document.createElement('fieldset');
             fieldset.className = 'mb-2';
             const legend = document.createElement('legend');
             legend.className = 'sr-only';
+            // legendには脚注番号を含まない元の質問文を使用
             legend.textContent = `${index + 1}. ${questionText}`;
             fieldset.appendChild(legend);
 
