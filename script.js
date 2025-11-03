@@ -253,27 +253,6 @@ function renderDiagnosisQuestions() {
         categoryTitle.textContent = category.label;
         groupDiv.appendChild(categoryTitle);
 
-        // 備考欄の追加
-        if (category.note) {
-            const noteDiv = document.createElement('p');
-            noteDiv.className = 'text-xs text-neutral-600 mb-3 italic';
-            noteDiv.textContent = category.note;
-            groupDiv.appendChild(noteDiv);
-        }
-
-        // 脚注説明の追加
-        if (category.footnotes && Object.keys(category.footnotes).length > 0) {
-            const footnotesDiv = document.createElement('div');
-            footnotesDiv.className = 'text-xs text-neutral-600 mb-3';
-            Object.keys(category.footnotes).sort((a, b) => Number(a) - Number(b)).forEach(footnoteNum => {
-                const footnoteP = document.createElement('p');
-                footnoteP.className = 'mb-1';
-                footnoteP.innerHTML = `※${footnoteNum} ${category.footnotes[footnoteNum]}`;
-                footnotesDiv.appendChild(footnoteP);
-            });
-            groupDiv.appendChild(footnotesDiv);
-        }
-
         category.questions.forEach((questionObj, index) => {
             const questionDiv = document.createElement('div');
             questionDiv.className = 'question-item';
@@ -308,6 +287,21 @@ function renderDiagnosisQuestions() {
             }
             questionP.innerHTML = displayText;
             questionDiv.appendChild(questionP);
+
+            // この質問に脚注がある場合、質問文の下に脚注説明を追加
+            if (questionFootnotes.length > 0 && category.footnotes) {
+                const footnotesDiv = document.createElement('div');
+                footnotesDiv.className = 'text-xs text-neutral-600 mb-2 mt-1';
+                questionFootnotes.forEach((footnoteNum) => {
+                    if (category.footnotes[footnoteNum]) {
+                        const footnoteP = document.createElement('p');
+                        footnoteP.className = 'mb-1';
+                        footnoteP.innerHTML = `※${footnoteNum} ${category.footnotes[footnoteNum]}`;
+                        footnotesDiv.appendChild(footnoteP);
+                    }
+                });
+                questionDiv.appendChild(footnotesDiv);
+            }
 
             const fieldset = document.createElement('fieldset');
             fieldset.className = 'mb-2';
