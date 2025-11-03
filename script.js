@@ -48,28 +48,6 @@ function optimizeMobileNavigation() {
     }
 }
 
-// スマホ専用のテーブル最適化
-function optimizeMobileTable() {
-    if (!isMobile) return;
-    
-    const table = document.getElementById('jobProfilesTable');
-    if (!table) return;
-    
-    // テーブルを横スクロール可能にする
-    table.classList.add('text-xs');
-    
-    // ヘッダーセルを小さくする
-    const headers = table.querySelectorAll('th');
-    headers.forEach(header => {
-        header.classList.add('text-xs', 'px-1', 'py-1');
-    });
-    
-    // データセルを小さくする
-    const cells = table.querySelectorAll('td');
-    cells.forEach(cell => {
-        cell.classList.add('text-xs', 'px-1', 'py-1');
-    });
-}
 
 // スマホ専用のチャート最適化
 function optimizeMobileCharts() {
@@ -117,23 +95,36 @@ function optimizeMobileButtons() {
 function initializeResponsive() {
     detectDevice();
     optimizeMobileNavigation();
-    optimizeMobileTable();
     optimizeMobileCharts();
     optimizeMobileForm();
     optimizeMobileButtons();
 }
 
 // ウィンドウリサイズ時の対応
+let resizeTimeout;
 function handleResize() {
-    const previousMobile = isMobile;
-    const previousTablet = isTablet;
-    
-    detectDevice();
-    
-    // デバイスタイプが変わった場合のみ再最適化
-    if (previousMobile !== isMobile || previousTablet !== isTablet) {
-        location.reload(); // 簡単な実装のため、リロードで対応
-    }
+    // リサイズの連続呼び出しを防ぐため、デバウンス処理
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        const previousMobile = isMobile;
+        const previousTablet = isTablet;
+        
+        detectDevice();
+        
+        // デバイスタイプが変わった場合のみ再最適化
+        if (previousMobile !== isMobile || previousTablet !== isTablet) {
+            // リロードの代わりに、必要な最適化のみ再実行
+            initializeResponsive();
+            // チャートが存在する場合は再描画
+            if (userProfileChartInstance) {
+                const currentScores = userProfileChartInstance.data.datasets[0].data;
+                displayUserProfileChart(currentScores);
+            }
+        } else {
+            // デバイスタイプが同じ場合は、チャートのサイズのみ調整
+            optimizeMobileCharts();
+        }
+    }, 150);
 }
 
 // チャート関連のユーティリティ関数
@@ -143,20 +134,44 @@ function wrapLabels(labels, maxLength = 16) {
     
     return labels.map(label => {
         if (typeof label === 'string' && label.length > maxLen) {
-            const words = label.split(' ');
+            // 日本語対応: 文字数ベースで改行
             let lines = [];
             let currentLine = '';
-            words.forEach(word => {
-                if ((currentLine + word).length > maxLen && currentLine.length > 0) {
-                    lines.push(currentLine.trim());
-                    currentLine = word + ' ';
+            
+            // スペースまたは区切り文字で分割を試みる
+            const segments = label.split(/([\s・\(\)])/).filter(s => s.length > 0);
+            
+            segments.forEach(segment => {
+                // 現在の行に追加した場合の長さを計算
+                const testLine = currentLine + segment;
+                
+                // セグメント自体が長い場合は強制的に分割
+                if (segment.length > maxLen) {
+                    // 長いセグメントをさらに分割
+                    for (let i = 0; i < segment.length; i += maxLen) {
+                        const chunk = segment.substring(i, i + maxLen);
+                        if (currentLine.length > 0) {
+                            lines.push(currentLine);
+                            currentLine = chunk;
+                        } else {
+                            currentLine = chunk;
+                        }
+                    }
+                } else if (testLine.length > maxLen && currentLine.length > 0) {
+                    // 現在の行が長くなりすぎる場合は改行
+                    lines.push(currentLine);
+                    currentLine = segment;
                 } else {
-                    currentLine += word + ' ';
+                    // 追加しても問題ない
+                    currentLine = testLine;
                 }
             });
+            
+            // 残りの行を追加
             if (currentLine.trim().length > 0) {
                 lines.push(currentLine.trim());
             }
+            
             return lines.length > 0 ? lines : [label];
         }
         return label;
@@ -211,91 +226,6 @@ const commonChartOptions = (titleText = '') => ({
     }
 });
 
-// 職種プロファイルチャート関連
-let jobProfileChartInstance;
-const jobProfileCtx = document.getElementById('jobProfileChart');
-const jobProfileChartDesc = document.getElementById('jobProfileChartDesc');
-const jobSelector = document.getElementById('jobSelector');
-
-// 職種セレクターの初期化
-function initializeJobSelector() {
-    if (jobSelector) {
-        Object.keys(jobData).forEach(jobName => {
-            const option = document.createElement('option');
-            option.value = jobName;
-            option.textContent = jobName;
-            jobSelector.appendChild(option);
-        });
-    }
-}
-
-// 職種プロファイルチャートのイベントリスナー
-function setupJobProfileChart() {
-    if (jobSelector && jobProfileCtx) {
-        jobSelector.addEventListener('change', function() {
-            const selectedJob = this.value;
-            if (selectedJob && jobData[selectedJob]) {
-                const scores = jobData[selectedJob];
-                if (jobProfileChartInstance) {
-                    jobProfileChartInstance.destroy();
-                }
-                jobProfileChartInstance = new Chart(jobProfileCtx.getContext('2d'), {
-                    type: 'radar',
-                    data: {
-                        labels: wrapLabels(categoryLabels, 20),
-                        datasets: [{
-                            label: selectedJob + ' スキルプロファイル',
-                            data: scores,
-                            fill: true,
-                            backgroundColor: 'rgba(217, 119, 6, 0.2)',
-                            borderColor: 'rgb(217, 119, 6)',
-                            pointBackgroundColor: 'rgb(217, 119, 6)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgb(217, 119, 6)'
-                        }]
-                    },
-                    options: {
-                        ...commonChartOptions(),
-                        scales: {
-                            r: {
-                                angleLines: { display: true, color: '#d4d4d4' },
-                                suggestedMin: 0,
-                                suggestedMax: 4,
-                                pointLabels: {
-                                    font: { 
-                                        size: isMobile ? 8 : 10, 
-                                        family: "'Noto Sans JP', sans-serif" 
-                                    },
-                                    color: '#262626'
-                                },
-                                ticks: {
-                                    stepSize: 1,
-                                    backdropColor: 'rgba(255,250,240,0.5)',
-                                    color: '#737373',
-                                    font: {
-                                        size: isMobile ? 8 : 10
-                                    }
-                                },
-                                grid: { color: '#e5e5e5' }
-                            }
-                        },
-                        elements: {
-                            line: { borderWidth: 2 }
-                        }
-                    }
-                });
-                jobProfileChartDesc.textContent = `${selectedJob}の理想的なスキルプロファイル。各カテゴリのスコアは0～4点で評価されます。`;
-            } else {
-                 if (jobProfileChartInstance) {
-                    jobProfileChartInstance.destroy();
-                    jobProfileChartInstance = null;
-                }
-                jobProfileChartDesc.textContent = '職種を選択すると、ここにスキルプロファイルが表示されます。';
-            }
-        });
-    }
-}
 
 // 診断フォーム関連
 const diagnosisForm = document.getElementById('diagnosisForm');
@@ -304,6 +234,8 @@ const resetButton = document.getElementById('resetButton');
 const diagnosisResultDiv = document.getElementById('diagnosisResult');
 const userScoresList = document.getElementById('userScoresList');
 const recommendedJobSpan = document.getElementById('recommendedJob');
+const errorMessageDiv = document.getElementById('errorMessage');
+const errorMessageText = document.getElementById('errorMessageText');
 let userProfileChartInstance;
 
 // 診断質問のレンダリング
@@ -313,7 +245,10 @@ function renderDiagnosisQuestions() {
         const category = diagnosisQuestions[categoryKey];
         const groupDiv = document.createElement('div');
         groupDiv.className = 'question-group';
+        groupDiv.setAttribute('role', 'group');
+        groupDiv.setAttribute('aria-labelledby', `category-${categoryKey}`);
         const categoryTitle = document.createElement('h4');
+        categoryTitle.id = `category-${categoryKey}`;
         categoryTitle.className = 'text-lg font-semibold';
         categoryTitle.textContent = category.label;
         groupDiv.appendChild(categoryTitle);
@@ -325,8 +260,16 @@ function renderDiagnosisQuestions() {
 
             const questionP = document.createElement('p');
             questionP.className = 'mb-2 text-neutral-800';
+            questionP.id = `question-${questionId}`;
             questionP.textContent = `${index + 1}. ${questionText}`;
             questionDiv.appendChild(questionP);
+
+            const fieldset = document.createElement('fieldset');
+            fieldset.className = 'mb-2';
+            const legend = document.createElement('legend');
+            legend.className = 'sr-only';
+            legend.textContent = `${index + 1}. ${questionText}`;
+            fieldset.appendChild(legend);
 
             const yesInput = document.createElement('input');
             yesInput.type = 'radio';
@@ -334,12 +277,14 @@ function renderDiagnosisQuestions() {
             yesInput.name = `q-${questionId}`;
             yesInput.value = 'yes';
             yesInput.className = 'radio-input text-amber-500 focus:ring-amber-500';
-            questionDiv.appendChild(yesInput);
+            yesInput.setAttribute('aria-labelledby', `question-${questionId} yes-label-${questionId}`);
+            fieldset.appendChild(yesInput);
             const yesLabel = document.createElement('label');
+            yesLabel.id = `yes-label-${questionId}`;
             yesLabel.htmlFor = `yes-${questionId}`;
             yesLabel.className = 'radio-label text-neutral-700 mr-4';
             yesLabel.textContent = 'はい';
-            questionDiv.appendChild(yesLabel);
+            fieldset.appendChild(yesLabel);
 
             const noInput = document.createElement('input');
             noInput.type = 'radio';
@@ -347,13 +292,16 @@ function renderDiagnosisQuestions() {
             noInput.name = `q-${questionId}`;
             noInput.value = 'no';
             noInput.className = 'radio-input text-neutral-500 focus:ring-neutral-500';
-            questionDiv.appendChild(noInput);
+            noInput.setAttribute('aria-labelledby', `question-${questionId} no-label-${questionId}`);
+            fieldset.appendChild(noInput);
             const noLabel = document.createElement('label');
+            noLabel.id = `no-label-${questionId}`;
             noLabel.htmlFor = `no-${questionId}`;
             noLabel.className = 'radio-label text-neutral-700';
             noLabel.textContent = 'いいえ';
-            questionDiv.appendChild(noLabel);
+            fieldset.appendChild(noLabel);
 
+            questionDiv.appendChild(fieldset);
             groupDiv.appendChild(questionDiv);
         });
         diagnosisForm.appendChild(groupDiv);
@@ -362,8 +310,11 @@ function renderDiagnosisQuestions() {
 
 // 診断計算
 function calculateDiagnosis() {
-    const userScores = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+    const userScores = { A1: 0, A2: 0, B: 0, C: 0, D: 0, E: 0 };
     let allAnswered = true;
+
+    // カテゴリの順序を定義（categoryLabelsの順序に合わせる）
+    const categoryOrder = ['A1', 'A2', 'B', 'C', 'D', 'E'];
 
     Object.keys(diagnosisQuestions).forEach(categoryKey => {
         diagnosisQuestions[categoryKey].questions.forEach((_, index) => {
@@ -378,22 +329,26 @@ function calculateDiagnosis() {
     });
 
     if (!allAnswered) {
-        alert('全ての質問に回答してください。');
+        showErrorMessage('全ての質問に回答してください。');
         return;
     }
+    
+    // エラーメッセージを非表示にする
+    hideErrorMessage();
 
-    displayUserScores(userScores);
-    const recommendedJob = findBestMatchJob(Object.values(userScores));
+    displayUserScores(userScores, categoryOrder);
+    const scoresArray = categoryOrder.map(key => userScores[key]);
+    const recommendedJob = findBestMatchJob(scoresArray);
     recommendedJobSpan.textContent = recommendedJob;
-    displayUserProfileChart(Object.values(userScores));
+    displayUserProfileChart(scoresArray);
     diagnosisResultDiv.classList.remove('hidden');
     diagnosisResultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ユーザースコアの表示
-function displayUserScores(scores) {
+function displayUserScores(scores, categoryOrder) {
     userScoresList.innerHTML = '';
-    Object.keys(scores).forEach((key, index) => {
+    categoryOrder.forEach((key, index) => {
         const listItem = document.createElement('li');
         listItem.textContent = `${categoryLabels[index]}: ${scores[key]}点`;
         userScoresList.appendChild(listItem);
@@ -447,7 +402,7 @@ function displayUserProfileChart(scores) {
                 r: {
                     angleLines: { display: true, color: '#d4d4d4' },
                     suggestedMin: 0,
-                    suggestedMax: 4,
+                    suggestedMax: 5,
                     pointLabels: {
                         font: { 
                             size: isMobile ? 8 : 10, 
@@ -473,10 +428,29 @@ function displayUserProfileChart(scores) {
     });
 }
 
+// エラーメッセージの表示
+function showErrorMessage(message) {
+    if (errorMessageText) {
+        errorMessageText.textContent = message;
+    }
+    if (errorMessageDiv) {
+        errorMessageDiv.classList.remove('hidden');
+        errorMessageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+
+// エラーメッセージの非表示
+function hideErrorMessage() {
+    if (errorMessageDiv) {
+        errorMessageDiv.classList.add('hidden');
+    }
+}
+
 // 診断のリセット
 function resetDiagnosis() {
     diagnosisForm.reset();
     diagnosisResultDiv.classList.add('hidden');
+    hideErrorMessage();
     if (userProfileChartInstance) {
         userProfileChartInstance.destroy();
         userProfileChartInstance = null;
@@ -495,8 +469,6 @@ function setupEventListeners() {
 // 初期化関数
 function initialize() {
     initializeResponsive();
-    initializeJobSelector();
-    setupJobProfileChart();
     setupEventListeners();
     renderDiagnosisQuestions();
 }
