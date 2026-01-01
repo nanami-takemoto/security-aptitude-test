@@ -63,19 +63,37 @@
                 リセット
             </button>
 
-            <div id="diagnosisResult" class="mt-8 p-6 bg-white rounded-lg shadow-inner border border-amber-200 hidden" role="region" aria-labelledby="diagnosisResultTitle">
+            <div id="diagnosisResult" class="mt-8 p-6 bg-white rounded-lg shadow-inner border border-amber-200" role="region" aria-labelledby="diagnosisResultTitle">
                 <h3 id="diagnosisResultTitle" class="text-xl font-semibold mb-4 text-amber-700">あなたの診断結果</h3>
                 <p class="mb-4 text-neutral-700">あなたのスキルプロファイルと、最も適性が高いと診断された職種は以下の通りです。</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                    <div>
-                        <p class="text-xl font-bold text-neutral-800 mb-4">おすすめの職種: <span id="recommendedJob" class="text-amber-700" aria-live="polite"></span></p>
-                        <p class="text-lg font-medium text-neutral-800 mb-2">あなたのカテゴリ別スコア:</p>
-                        <ul id="userScoresList" class="list-disc list-inside text-neutral-700 mb-4" aria-label="カテゴリ別スコア一覧">
-                            <!-- User scores will be listed here -->
-                        </ul>
+                <div class="grid grid-cols-1 md:grid-cols-2 grid-rows-2 gap-6">
+                    <!-- 左上：診断結果の文章 -->
+                    <div class="row-span-1">
+                        <p class="text-xl font-bold text-neutral-800 mb-4">おすすめの職種: <span id="recommendedJob" class="text-amber-700 text-lg" aria-live="polite"></span></p>
+                        <div id="jobDescription" class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-neutral-700 text-base whitespace-pre-line hidden">
+                            <!-- 職種説明がここに表示されます -->
+                        </div>
                     </div>
-                    <div class="chart-container mx-auto">
-                        <canvas id="userProfileChart" aria-label="あなたのスキルプロファイルを表示するレーダーチャート" role="img"></canvas>
+                    <!-- 右上：イラスト -->
+                    <div class="row-span-1 flex items-center">
+                        <div id="jobIllustration" class="w-1/2 aspect-square border-2 border-neutral-400 bg-neutral-100 flex items-center justify-center mx-auto">
+                            <span class="text-neutral-500 text-sm">イラスト（仮置き）</span>
+                        </div>
+                    </div>
+                    <!-- 左下：スパイダーチャート -->
+                    <div class="row-span-1">
+                        <div class="chart-container mx-auto">
+                            <canvas id="userProfileChart" aria-label="あなたのスキルプロファイルを表示するレーダーチャート" role="img"></canvas>
+                        </div>
+                    </div>
+                    <!-- 右下：スコアの配点 -->
+                    <div class="row-span-1 md:flex md:justify-end">
+                        <div class="w-full md:w-1/2 md:mr-16">
+                            <p class="text-lg font-medium text-neutral-800 mb-2">あなたのカテゴリ別スコア:</p>
+                            <ul id="userScoresList" class="list-disc list-inside text-neutral-700 mb-4" aria-label="カテゴリ別スコア一覧">
+                                <!-- User scores will be listed here -->
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

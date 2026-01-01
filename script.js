@@ -234,6 +234,7 @@ const resetButton = document.getElementById('resetButton');
 const diagnosisResultDiv = document.getElementById('diagnosisResult');
 const userScoresList = document.getElementById('userScoresList');
 const recommendedJobSpan = document.getElementById('recommendedJob');
+const jobDescriptionDiv = document.getElementById('jobDescription');
 const errorMessageDiv = document.getElementById('errorMessage');
 const errorMessageText = document.getElementById('errorMessageText');
 let userProfileChartInstance;
@@ -249,7 +250,7 @@ function renderDiagnosisQuestions() {
         groupDiv.setAttribute('aria-labelledby', `category-${categoryKey}`);
         const categoryTitle = document.createElement('h4');
         categoryTitle.id = `category-${categoryKey}`;
-        categoryTitle.className = 'text-lg font-semibold';
+        categoryTitle.className = 'text-lg font-semibold whitespace-nowrap';
         categoryTitle.textContent = category.label;
         groupDiv.appendChild(categoryTitle);
 
@@ -380,9 +381,22 @@ function calculateDiagnosis() {
     const scoresArray = categoryOrder.map(key => userScores[key]);
     const recommendedJob = findBestMatchJob(scoresArray);
     recommendedJobSpan.textContent = recommendedJob;
+    displayJobDescription(recommendedJob);
     displayUserProfileChart(scoresArray);
     diagnosisResultDiv.classList.remove('hidden');
     diagnosisResultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// 職種説明の表示
+function displayJobDescription(jobName) {
+    if (jobDescriptionDiv) {
+        if (jobDescriptions && jobDescriptions[jobName]) {
+            jobDescriptionDiv.textContent = jobDescriptions[jobName];
+            jobDescriptionDiv.classList.remove('hidden');
+        } else {
+            jobDescriptionDiv.classList.add('hidden');
+        }
+    }
 }
 
 // ユーザースコアの表示
@@ -491,6 +505,9 @@ function resetDiagnosis() {
     diagnosisForm.reset();
     diagnosisResultDiv.classList.add('hidden');
     hideErrorMessage();
+    if (jobDescriptionDiv) {
+        jobDescriptionDiv.classList.add('hidden');
+    }
     if (userProfileChartInstance) {
         userProfileChartInstance.destroy();
         userProfileChartInstance = null;
@@ -511,6 +528,22 @@ function initialize() {
     initializeResponsive();
     setupEventListeners();
     renderDiagnosisQuestions();
+    // テスト用：診断結果を常に表示
+    displayTestResult();
+}
+
+// テスト用：診断結果を表示
+function displayTestResult() {
+    const testScores = { A1: 2, A2: 0, B: 1, C: 1, D: 4, E: 5 };
+    const categoryOrder = ['A1', 'A2', 'B', 'C', 'D', 'E'];
+    const scoresArray = categoryOrder.map(key => testScores[key]);
+    const recommendedJob = 'CEO';
+    
+    displayUserScores(testScores, categoryOrder);
+    recommendedJobSpan.textContent = recommendedJob;
+    displayJobDescription(recommendedJob);
+    displayUserProfileChart(scoresArray);
+    diagnosisResultDiv.classList.remove('hidden');
 }
 
 // DOMContentLoadedイベントで初期化
