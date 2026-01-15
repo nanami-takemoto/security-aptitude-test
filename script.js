@@ -201,7 +201,7 @@ const commonChartOptions = (titleText = '') => ({
                 family: "'Noto Sans JP', sans-serif", 
                 weight: 'bold' 
             },
-            color: '#b45309'
+            color: '#6b21a8'
         },
         tooltip: {
             callbacks: {
@@ -235,6 +235,8 @@ const diagnosisResultDiv = document.getElementById('diagnosisResult');
 const userScoresList = document.getElementById('userScoresList');
 const recommendedJobSpan = document.getElementById('recommendedJob');
 const jobDescriptionDiv = document.getElementById('jobDescription');
+const jobIllustrationDiv = document.getElementById('jobIllustration');
+const shareToTwitterButton = document.getElementById('shareToTwitterButton');
 const errorMessageDiv = document.getElementById('errorMessage');
 const errorMessageText = document.getElementById('errorMessageText');
 let userProfileChartInstance;
@@ -317,7 +319,7 @@ function renderDiagnosisQuestions() {
             yesInput.id = `yes-${questionId}`;
             yesInput.name = `q-${questionId}`;
             yesInput.value = 'yes';
-            yesInput.className = 'radio-input text-amber-500 focus:ring-amber-500';
+            yesInput.className = 'radio-input text-purple-500 focus:ring-purple-500';
             yesInput.setAttribute('aria-labelledby', `question-${questionId} yes-label-${questionId}`);
             fieldset.appendChild(yesInput);
             const yesLabel = document.createElement('label');
@@ -382,6 +384,7 @@ function calculateDiagnosis() {
     const recommendedJob = findBestMatchJob(scoresArray);
     recommendedJobSpan.textContent = recommendedJob;
     displayJobDescription(recommendedJob);
+    displayJobIllustration(recommendedJob);
     displayUserProfileChart(scoresArray);
     diagnosisResultDiv.classList.remove('hidden');
     diagnosisResultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -395,6 +398,31 @@ function displayJobDescription(jobName) {
             jobDescriptionDiv.classList.remove('hidden');
         } else {
             jobDescriptionDiv.classList.add('hidden');
+        }
+    }
+}
+
+// 職種イラストの表示
+function displayJobIllustration(jobName) {
+    if (jobIllustrationDiv) {
+        // 既存の内容をクリア
+        jobIllustrationDiv.innerHTML = '';
+        
+        if (jobIllustrations && jobIllustrations[jobName] && jobIllustrations[jobName] !== '') {
+            // イラスト画像が設定されている場合
+            const img = document.createElement('img');
+            img.src = jobIllustrations[jobName];
+            img.alt = `${jobName}のイラスト`;
+            img.className = 'w-full h-full object-contain';
+            jobIllustrationDiv.appendChild(img);
+            jobIllustrationDiv.classList.remove('border-2', 'border-neutral-400', 'bg-neutral-100');
+        } else {
+            // イラストが設定されていない場合、プレースホルダーを表示
+            const placeholder = document.createElement('span');
+            placeholder.className = 'text-neutral-500 text-sm';
+            placeholder.textContent = 'イラスト（準備中）';
+            jobIllustrationDiv.appendChild(placeholder);
+            jobIllustrationDiv.classList.add('border-2', 'border-neutral-400', 'bg-neutral-100');
         }
     }
 }
@@ -508,16 +536,67 @@ function resetDiagnosis() {
     if (jobDescriptionDiv) {
         jobDescriptionDiv.classList.add('hidden');
     }
+    if (jobIllustrationDiv) {
+        jobIllustrationDiv.innerHTML = '<span class="text-neutral-500 text-sm">イラスト（仮置き）</span>';
+        jobIllustrationDiv.classList.add('border-2', 'border-neutral-400', 'bg-neutral-100');
+    }
     if (userProfileChartInstance) {
         userProfileChartInstance.destroy();
         userProfileChartInstance = null;
     }
 }
 
+// 職種名からHTMLページのパスを取得
+function getJobPagePath(jobName) {
+    const jobPageMap = {
+        "CEO": "ceo.html",
+        "CISO": "ciso.html",
+        "脆弱性診断士・ペネトレーションテスト": "penetration-test.html",
+        "SOC/CSIRT": "soc-csirt.html",
+        "Security Analysts": "security-analysts.html",
+        "フォレンジクス": "forensics.html",
+        "セキュリティーソリューション開発エンジニア": "security-engineer.html",
+        "技術営業": "technical-sales.html",
+        "セキュリティコンサルタント": "security-consultant.html"
+    };
+    return jobPageMap[jobName] || null;
+}
+
+// 診断結果をXに投稿
+function shareToTwitter() {
+    if (!recommendedJobSpan.textContent) {
+        alert('診断結果が表示されていません。');
+        return;
+    }
+    
+    // 職種名からHTMLページのURLを取得
+    const jobName = recommendedJobSpan.textContent;
+    const jobPagePath = getJobPagePath(jobName);
+    
+    if (!jobPagePath) {
+        alert('職種ページが見つかりません。');
+        return;
+    }
+    
+    // テキストを生成
+    const text = `私におすすめの職種は${jobName}でした #セキュリティ適職診断`;
+    const jobPageUrl = `https://nanami-takemoto.github.io/security-aptitude-test/images/${jobPagePath}`;
+    
+    // Xの投稿URLを生成
+    const tweetText = encodeURIComponent(`${text}\n\n${jobPageUrl}`);
+    const twitterUrl = `https://x.com/intent/tweet?text=${tweetText}`;
+    
+    // Xの投稿画面を開く
+    window.open(twitterUrl, '_blank');
+}
+
 // イベントリスナーの設定
 function setupEventListeners() {
     diagnoseButton.addEventListener('click', calculateDiagnosis);
     resetButton.addEventListener('click', resetDiagnosis);
+    if (shareToTwitterButton) {
+        shareToTwitterButton.addEventListener('click', shareToTwitter);
+    }
     
     // リサイズイベントリスナー
     window.addEventListener('resize', handleResize);
@@ -542,6 +621,7 @@ function displayTestResult() {
     displayUserScores(testScores, categoryOrder);
     recommendedJobSpan.textContent = recommendedJob;
     displayJobDescription(recommendedJob);
+    displayJobIllustration(recommendedJob);
     displayUserProfileChart(scoresArray);
     diagnosisResultDiv.classList.remove('hidden');
 }
