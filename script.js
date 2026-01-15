@@ -287,8 +287,12 @@ function renderDiagnosisQuestions() {
                         displayText += ` <sup class="text-xs align-super">※${footnoteNum}</sup>`;
                     }
                 });
+                // HTMLタグを含む場合はinnerHTMLを使用（ただし、data.jsの静的なデータのみ）
+                questionP.innerHTML = displayText;
+            } else {
+                // HTMLタグがない場合はtextContentを使用
+                questionP.textContent = displayText;
             }
-            questionP.innerHTML = displayText;
             questionDiv.appendChild(questionP);
 
             // この質問に脚注がある場合、質問文の下に脚注説明を追加
@@ -299,7 +303,8 @@ function renderDiagnosisQuestions() {
                     if (category.footnotes[footnoteNum]) {
                         const footnoteP = document.createElement('p');
                         footnoteP.className = 'mb-1';
-                        footnoteP.innerHTML = `※${footnoteNum} ${category.footnotes[footnoteNum]}`;
+                        // data.jsの静的なデータなので、textContentで十分
+                        footnoteP.textContent = `※${footnoteNum} ${category.footnotes[footnoteNum]}`;
                         footnotesDiv.appendChild(footnoteP);
                     }
                 });
