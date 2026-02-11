@@ -37,6 +37,19 @@ const jobIllustrations = {
     "セキュリティコンサルタント": "images/security-consultant.svg"
 };
 
+// 診断結果用の職業別イメージ画像（*_add.png）
+const jobResultImages = {
+    "CEO": "images/CEO_add.png",
+    "CISO": "images/CISO_add.png",
+    "脆弱性診断士・ペネトレーションテスト": "images/pentester_add.png",
+    "SOC/CSIRT": "images/SOC_CSIRT_add.png",
+    "Security Analysts": "images/analyst_add.png",
+    "フォレンジクス": "images/forensic_add.png",
+    "セキュリティーソリューション開発エンジニア": "images/engineer_add.png",
+    "技術営業": "images/technical_sales_add.png",
+    "セキュリティコンサルタント": "images/consultant_add.png"
+};
+
 // カテゴリラベル
 const categoryLabels = [
     '(A-1) 探求・分析・問題解決',

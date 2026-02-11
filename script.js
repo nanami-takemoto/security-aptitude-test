@@ -201,7 +201,7 @@ const commonChartOptions = (titleText = '') => ({
                 family: "'Noto Sans JP', sans-serif", 
                 weight: 'bold' 
             },
-            color: '#6b21a8'
+            color: '#1d4ed8'
         },
         tooltip: {
             callbacks: {
@@ -324,7 +324,7 @@ function renderDiagnosisQuestions() {
             yesInput.id = `yes-${questionId}`;
             yesInput.name = `q-${questionId}`;
             yesInput.value = 'yes';
-            yesInput.className = 'radio-input text-purple-500 focus:ring-purple-500';
+            yesInput.className = 'radio-input text-blue-500 focus:ring-blue-500';
             yesInput.setAttribute('aria-labelledby', `question-${questionId} yes-label-${questionId}`);
             fieldset.appendChild(yesInput);
             const yesLabel = document.createElement('label');
@@ -407,16 +407,19 @@ function displayJobDescription(jobName) {
     }
 }
 
-// 職種イラストの表示
+// 職種イラストの表示（診断結果用：*_add.png を優先、なければ SVG）
 function displayJobIllustration(jobName) {
     if (jobIllustrationDiv) {
         // 既存の内容をクリア
         jobIllustrationDiv.innerHTML = '';
         
-        if (jobIllustrations && jobIllustrations[jobName] && jobIllustrations[jobName] !== '') {
-            // イラスト画像が設定されている場合
+        const imagePath = (jobResultImages && jobResultImages[jobName])
+            ? jobResultImages[jobName]
+            : (jobIllustrations && jobIllustrations[jobName]) ? jobIllustrations[jobName] : '';
+        
+        if (imagePath !== '') {
             const img = document.createElement('img');
-            img.src = jobIllustrations[jobName];
+            img.src = imagePath;
             img.alt = `${jobName}のイラスト`;
             img.className = 'w-full h-full object-contain';
             jobIllustrationDiv.appendChild(img);
