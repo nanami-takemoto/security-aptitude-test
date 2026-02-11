@@ -24,19 +24,6 @@ const jobDescriptions = {
     "セキュリティコンサルタント": "組織のセキュリティ対策を\"伴走\"しながら設計するアドバイザー。\nリスク評価やポリシー策定など、守りの仕組みを整える役割です。\n【こんな方にお勧め】\n\"その現場に合った正解\"がなにかを考えることにおもしろさを感じられる人に。"
 };
 
-// 職種ごとのイラストデータ（画像パス）
-const jobIllustrations = {
-    "CEO": "images/ceo.svg",
-    "CISO": "images/ciso.svg",
-    "脆弱性診断士・ペネトレーションテスト": "images/penetration-test.svg",
-    "SOC/CSIRT": "images/soc-csirt.svg",
-    "Security Analysts": "images/security-analysts.svg",
-    "フォレンジクス": "images/forensics.svg",
-    "セキュリティーソリューション開発エンジニア": "images/security-engineer.svg",
-    "技術営業": "images/technical-sales.svg",
-    "セキュリティコンサルタント": "images/security-consultant.svg"
-};
-
 // 診断結果用の職業別イメージ画像（*_add.png）
 const jobResultImages = {
     "CEO": "images/CEO_add.png",

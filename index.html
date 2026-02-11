@@ -35,6 +35,7 @@
             <div class="space-x-4">
                 <a href="#purpose" class="nav-link">目的</a>
                 <a href="#diagnosis-tool" class="nav-link">診断を試す</a>
+                <a href="jobs.html" class="nav-link">職種一覧</a>
             </div>
         </div>
     </nav>
@@ -105,11 +106,24 @@
                     </div>
                     </div>
                 </div>
-                <!-- X投稿ボタン -->
-                <div class="mt-6 text-center">
-                    <button id="shareToTwitterButton" class="px-6 py-3 bg-blue-500 text-white font-bold rounded-lg shadow-md hover:bg-blue-600 transition duration-300" aria-label="診断結果をXに投稿">
-                        診断結果をXに投稿する
-                    </button>
+                <!-- 診断結果をSNSでシェアする -->
+                <div class="mt-8 p-6 rounded-xl bg-white border border-blue-200 shadow-sm">
+                    <h4 class="text-lg font-bold text-blue-500 mb-4 flex items-center gap-2">
+                        <span class="text-xl" aria-hidden="true">📤</span>
+                        診断結果をSNSでシェアする
+                    </h4>
+                    <!-- ボタン一列 -->
+                    <div class="flex flex-wrap gap-3 mb-4">
+                        <a id="shareToTwitterButton" href="#" role="button" class="flex-1 min-w-[200px] inline-flex items-center justify-center py-4 px-6 rounded-xl bg-neutral-800 text-white font-bold text-lg hover:bg-neutral-700 transition duration-200 shadow-md" aria-label="診断結果をXに投稿">
+                            <span class="font-bold">X</span>
+                            <span class="ml-2">診断結果をXに投稿する</span>
+                        </a>
+                        <button type="button" id="copyResultButton" class="flex-1 min-w-[200px] py-4 px-6 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-bold text-lg transition duration-200 shadow-md" aria-label="診断結果をコピーで共有">
+                            診断結果をコピーで共有
+                        </button>
+                    </div>
+                    <!-- コピー内容のプレビュー -->
+                    <textarea id="shareTextPreview" class="w-full p-4 rounded-lg border border-blue-200 bg-blue-50/50 text-neutral-800 text-sm resize-y min-h-[80px] read-only focus:outline-none focus:ring-2 focus:ring-blue-400" readonly rows="4" aria-readonly="true"></textarea>
                 </div>
             </div>
         </section>

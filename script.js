@@ -237,6 +237,8 @@ const recommendedJobSpan = document.getElementById('recommendedJob');
 const jobDescriptionDiv = document.getElementById('jobDescription');
 const jobIllustrationDiv = document.getElementById('jobIllustration');
 const shareToTwitterButton = document.getElementById('shareToTwitterButton');
+const copyResultButton = document.getElementById('copyResultButton');
+const shareTextPreview = document.getElementById('shareTextPreview');
 const errorMessageDiv = document.getElementById('errorMessage');
 const errorMessageText = document.getElementById('errorMessageText');
 let userProfileChartInstance;
@@ -391,6 +393,7 @@ function calculateDiagnosis() {
     displayJobDescription(recommendedJob);
     displayJobIllustration(recommendedJob);
     displayUserProfileChart(scoresArray);
+    updateShareTextPreview(recommendedJob);
     diagnosisResultDiv.classList.remove('hidden');
     diagnosisResultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -413,9 +416,7 @@ function displayJobIllustration(jobName) {
         // 既存の内容をクリア
         jobIllustrationDiv.innerHTML = '';
         
-        const imagePath = (jobResultImages && jobResultImages[jobName])
-            ? jobResultImages[jobName]
-            : (jobIllustrations && jobIllustrations[jobName]) ? jobIllustrations[jobName] : '';
+        const imagePath = (jobResultImages && jobResultImages[jobName]) ? jobResultImages[jobName] : '';
         
         if (imagePath !== '') {
             const img = document.createElement('img');
@@ -570,32 +571,103 @@ function getJobPagePath(jobName) {
     return jobPageMap[jobName] || null;
 }
 
-// 診断結果をXに投稿
-function shareToTwitter() {
-    if (!recommendedJobSpan.textContent) {
+// 共有用URLのみ取得
+function getShareUrl(jobName) {
+    if (!jobName) return '';
+    const jobPagePath = getJobPagePath(jobName);
+    return jobPagePath
+        ? `https://nanami-takemoto.github.io/security-aptitude-test/share/${jobPagePath}`
+        : '';
+}
+
+// 共有用テキストを取得（表示・コピー両方で使用）
+function getShareText(jobName) {
+    if (!jobName) return '';
+    const text = `私におすすめの職種は${jobName}でした #セキュリティ適職診断`;
+    const url = getShareUrl(jobName);
+    return url ? `${text}\n\n${url}` : text;
+}
+
+// 共有用テキストのプレビューを更新
+function updateShareTextPreview(jobName) {
+    var name = jobName || (recommendedJobSpan && recommendedJobSpan.textContent);
+    if (shareTextPreview) {
+        shareTextPreview.value = getShareText(name);
+    }
+}
+
+// 汎用: テキストをコピーしてボタンにフィードバック
+function copyToClipboardWithFeedback(text, buttonEl) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function() {
+            showCopyFeedback(buttonEl);
+        }).catch(function() {
+            fallbackCopyToClipboard(text, buttonEl);
+        });
+    } else {
+        fallbackCopyToClipboard(text, buttonEl);
+    }
+}
+function showCopyFeedback(buttonEl) {
+    if (buttonEl) {
+        var orig = buttonEl.textContent;
+        buttonEl.textContent = 'コピーしました！';
+        buttonEl.disabled = true;
+        setTimeout(function() {
+            buttonEl.textContent = orig;
+            buttonEl.disabled = false;
+        }, 2000);
+    } else {
+        alert('コピーしました。');
+    }
+}
+
+// 診断結果テキストをクリップボードにコピー
+function copyResultToClipboard() {
+    if (!recommendedJobSpan || !recommendedJobSpan.textContent) {
         alert('診断結果が表示されていません。');
         return;
     }
-    
-    // 職種名からHTMLページのURLを取得
-    const jobName = recommendedJobSpan.textContent;
-    const jobPagePath = getJobPagePath(jobName);
-    
+    const copyText = getShareText(recommendedJobSpan.textContent);
+    if (!copyText) {
+        alert('共有用テキストを取得できませんでした。');
+        return;
+    }
+    copyToClipboardWithFeedback(copyText, copyResultButton);
+}
+function fallbackCopyToClipboard(text, buttonEl) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+        document.execCommand('copy');
+        showCopyFeedback(buttonEl || copyResultButton);
+    } catch (e) {
+        alert('コピーに失敗しました。');
+    }
+    document.body.removeChild(ta);
+}
+
+// 診断結果をXに投稿
+function shareToTwitter(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!recommendedJobSpan || !recommendedJobSpan.textContent) {
+        alert('診断結果が表示されていません。');
+        return;
+    }
+    var jobName = recommendedJobSpan.textContent;
+    var jobPagePath = getJobPagePath(jobName);
     if (!jobPagePath) {
         alert('職種ページが見つかりません。');
         return;
     }
-    
-    // テキストを生成
-    const text = `私におすすめの職種は${jobName}でした #セキュリティ適職診断`;
-    const jobPageUrl = `https://nanami-takemoto.github.io/security-aptitude-test/images/${jobPagePath}`;
-    
-    // Xの投稿URLを生成
-    const tweetText = encodeURIComponent(`${text}\n\n${jobPageUrl}`);
-    const twitterUrl = `https://x.com/intent/tweet?text=${tweetText}`;
-    
-    // Xの投稿画面を開く
-    window.open(twitterUrl, '_blank');
+    var text = '私におすすめの職種は' + jobName + 'でした #セキュリティ適職診断';
+    var jobPageUrl = 'https://nanami-takemoto.github.io/security-aptitude-test/share/' + jobPagePath;
+    var tweetText = encodeURIComponent(text + '\n\n' + jobPageUrl);
+    window.open('https://x.com/intent/tweet?text=' + tweetText, '_blank');
 }
 
 // イベントリスナーの設定
@@ -604,6 +676,9 @@ function setupEventListeners() {
     resetButton.addEventListener('click', resetDiagnosis);
     if (shareToTwitterButton) {
         shareToTwitterButton.addEventListener('click', shareToTwitter);
+    }
+    if (copyResultButton) {
+        copyResultButton.addEventListener('click', copyResultToClipboard);
     }
     
     // リサイズイベントリスナー
@@ -631,6 +706,7 @@ function displayTestResult() {
     displayJobDescription(recommendedJob);
     displayJobIllustration(recommendedJob);
     displayUserProfileChart(scoresArray);
+    updateShareTextPreview(recommendedJob);
     diagnosisResultDiv.classList.remove('hidden');
 }
 
