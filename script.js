@@ -42,7 +42,7 @@ function optimizeMobileNavigation() {
     // ナビゲーションタイトルを短縮
     const navTitle = nav.querySelector('.text-xl');
     if (navTitle) {
-        navTitle.textContent = '適職診断';
+        navTitle.textContent = 'セキュリティ職種診断';
         navTitle.classList.remove('text-xl');
         navTitle.classList.add('text-lg');
     }
@@ -113,9 +113,9 @@ function handleResize() {
         
         // デバイスタイプが変わった場合のみ再最適化
         if (previousMobile !== isMobile || previousTablet !== isTablet) {
-            // リロードの代わりに、必要な最適化のみ再実行
             initializeResponsive();
-            // チャートが存在する場合は再描画
+            applyPurposeDiagnosisVisibility();
+            renderDiagnosisQuestions();
             if (userProfileChartInstance) {
                 const currentScores = userProfileChartInstance.data.datasets[0].data;
                 displayUserProfileChart(currentScores);
@@ -235,17 +235,195 @@ const diagnosisResultDiv = document.getElementById('diagnosisResult');
 const userScoresList = document.getElementById('userScoresList');
 const recommendedJobSpan = document.getElementById('recommendedJob');
 const jobDescriptionDiv = document.getElementById('jobDescription');
+const jobRecommendationDiv = document.getElementById('jobRecommendation');
+const jobRecommendationText = document.getElementById('jobRecommendationText');
 const jobIllustrationDiv = document.getElementById('jobIllustration');
 const shareToTwitterButton = document.getElementById('shareToTwitterButton');
 const copyResultButton = document.getElementById('copyResultButton');
 const shareTextPreview = document.getElementById('shareTextPreview');
 const errorMessageDiv = document.getElementById('errorMessage');
 const errorMessageText = document.getElementById('errorMessageText');
+const diagnosisToolSection = document.getElementById('diagnosis-tool');
+const purposeSection = document.getElementById('purpose');
+const startDiagnosisButton = document.getElementById('startDiagnosisButton');
 let userProfileChartInstance;
 
-// 診断質問のレンダリング
+// モバイル用: 全質問を1次元配列で取得
+function getAllQuestionsFlat() {
+    const categoryOrder = ['A1', 'A2', 'B', 'C', 'D', 'E'];
+    const flat = [];
+    categoryOrder.forEach(categoryKey => {
+        const category = diagnosisQuestions[categoryKey];
+        if (!category) return;
+        category.questions.forEach((questionObj, index) => {
+            flat.push({
+                categoryKey,
+                questionIndex: index,
+                categoryLabel: category.label,
+                questionObj,
+                footnotes: category.footnotes
+            });
+        });
+    });
+    return flat;
+}
+
+// モバイル用: 回答保存と現在表示インデックス
+let currentMobileQuestionIndex = 0;
+let mobileAnswers = {};
+
+function getTotalQuestionCount() {
+    return getAllQuestionsFlat().length;
+}
+
+// モバイル用: 1問だけ表示するカードを描画
+function renderMobileQuestionCard() {
+    const flat = getAllQuestionsFlat();
+    const total = flat.length;
+    const item = flat[currentMobileQuestionIndex];
+    if (!item) return;
+
+    const questionId = `${item.categoryKey}-${item.questionIndex}`;
+    let questionText, questionFootnotes = [];
+    if (typeof item.questionObj === 'object' && item.questionObj.text) {
+        questionText = item.questionObj.text;
+        questionFootnotes = item.questionObj.footnotes || [];
+    } else {
+        questionText = item.questionObj;
+    }
+
+    const progressPct = total > 0 ? ((currentMobileQuestionIndex + 1) / total) * 100 : 0;
+
+    diagnosisForm.innerHTML = '';
+    diagnosisForm.classList.add('mobile-quiz-container');
+
+    const progressWrap = document.createElement('div');
+    progressWrap.className = 'mobile-quiz-progress-wrap';
+    progressWrap.setAttribute('aria-hidden', 'true');
+    progressWrap.innerHTML = `
+        <div class="mobile-quiz-progress-bar" role="progressbar" aria-valuenow="${currentMobileQuestionIndex + 1}" aria-valuemin="1" aria-valuemax="${total}" aria-label="質問 ${currentMobileQuestionIndex + 1} / ${total}">
+            <div class="mobile-quiz-progress-fill" style="width:${progressPct}%"></div>
+        </div>
+        <p class="mobile-quiz-progress-text">${currentMobileQuestionIndex + 1} / ${total}</p>
+    `;
+    diagnosisForm.appendChild(progressWrap);
+
+    const card = document.createElement('div');
+    card.className = 'mobile-quiz-card';
+    card.setAttribute('role', 'group');
+    card.setAttribute('aria-labelledby', `mobile-question-${questionId}`);
+
+    const categoryP = document.createElement('p');
+    categoryP.className = 'mobile-quiz-category';
+    categoryP.textContent = item.categoryLabel;
+    card.appendChild(categoryP);
+
+    const questionP = document.createElement('p');
+    questionP.className = 'mobile-quiz-question';
+    questionP.id = `mobile-question-${questionId}`;
+    let displayText = questionText;
+    if (questionFootnotes.length > 0) {
+        questionFootnotes.forEach((footnoteNum) => {
+            if (footnoteNum === 1) {
+                displayText = displayText.replace('競プロ', `競プロ<sup class="text-xs align-super">※${footnoteNum}</sup>`);
+            } else {
+                displayText += ` <sup class="text-xs align-super">※${footnoteNum}</sup>`;
+            }
+        });
+        questionP.innerHTML = displayText;
+    } else {
+        questionP.textContent = displayText;
+    }
+    card.appendChild(questionP);
+
+    if (questionFootnotes.length > 0 && item.footnotes) {
+        const footnotesDiv = document.createElement('div');
+        footnotesDiv.className = 'mobile-quiz-footnotes';
+        questionFootnotes.forEach((footnoteNum) => {
+            if (item.footnotes[footnoteNum]) {
+                const footnoteP = document.createElement('p');
+                footnoteP.textContent = `※${footnoteNum} ${item.footnotes[footnoteNum]}`;
+                footnotesDiv.appendChild(footnoteP);
+            }
+        });
+        card.appendChild(footnotesDiv);
+    }
+
+    const fieldset = document.createElement('fieldset');
+    fieldset.className = 'mobile-quiz-choices';
+    const legend = document.createElement('legend');
+    legend.className = 'sr-only';
+    legend.textContent = questionText;
+    fieldset.appendChild(legend);
+
+    const yesBtn = document.createElement('button');
+    yesBtn.type = 'button';
+    yesBtn.className = 'mobile-quiz-btn mobile-quiz-btn-yes';
+    yesBtn.textContent = 'YES';
+    yesBtn.setAttribute('aria-pressed', mobileAnswers[questionId] === 'yes');
+    yesBtn.addEventListener('click', () => selectMobileAnswer(questionId, 'yes'));
+    fieldset.appendChild(yesBtn);
+
+    const noBtn = document.createElement('button');
+    noBtn.type = 'button';
+    noBtn.className = 'mobile-quiz-btn mobile-quiz-btn-no';
+    noBtn.textContent = 'NO';
+    noBtn.setAttribute('aria-pressed', mobileAnswers[questionId] === 'no');
+    noBtn.addEventListener('click', () => selectMobileAnswer(questionId, 'no'));
+    fieldset.appendChild(noBtn);
+
+    card.appendChild(fieldset);
+    diagnosisForm.appendChild(card);
+
+    const btnWrap = document.getElementById('diagnosisButtonWrap');
+    if (btnWrap) btnWrap.classList.add('hidden');
+}
+
+function selectMobileAnswer(questionId, value) {
+    mobileAnswers[questionId] = value;
+    const flat = getAllQuestionsFlat();
+    if (currentMobileQuestionIndex < flat.length - 1) {
+        currentMobileQuestionIndex++;
+        renderMobileQuestionCard();
+    } else {
+        renderMobileCompleteState();
+    }
+}
+
+// モバイル用: 全問答了時の「診断する」表示エリア
+function renderMobileCompleteState() {
+    const flat = getAllQuestionsFlat();
+    const total = flat.length;
+    diagnosisForm.innerHTML = '';
+    diagnosisForm.classList.add('mobile-quiz-container');
+    const done = document.createElement('div');
+    done.className = 'mobile-quiz-done';
+    done.innerHTML = `
+        <p class="mobile-quiz-done-text">全${total}問に回答しました</p>
+        <p class="mobile-quiz-done-sub">「診断する」をタップして結果を表示</p>
+    `;
+    diagnosisForm.appendChild(done);
+    const btnWrap = document.getElementById('diagnosisButtonWrap');
+    if (btnWrap) btnWrap.classList.remove('hidden');
+}
+
+// 診断質問のレンダリング（デスクトップは従来通り、モバイルは1問1ページ）
 function renderDiagnosisQuestions() {
     diagnosisForm.innerHTML = '';
+    diagnosisForm.classList.remove('mobile-quiz-container');
+
+    const btnWrap = document.getElementById('diagnosisButtonWrap');
+    if (btnWrap) btnWrap.classList.remove('hidden');
+
+    if (isMobile) {
+        currentMobileQuestionIndex = 0;
+        const flat = getAllQuestionsFlat();
+        if (flat.length === 0) return;
+        renderMobileQuestionCard();
+        return;
+    }
+
+    // デスクトップ: 既存の全質問表示（mobileAnswers があれば反映）
     Object.keys(diagnosisQuestions).forEach(categoryKey => {
         const category = diagnosisQuestions[categoryKey];
         const groupDiv = document.createElement('div');
@@ -263,7 +441,6 @@ function renderDiagnosisQuestions() {
             questionDiv.className = 'question-item';
             const questionId = `${categoryKey}-${index}`;
 
-            // 質問がオブジェクトの場合はtextプロパティを取得、文字列の場合はそのまま使用
             let questionText, questionFootnotes = [];
             if (typeof questionObj === 'object' && questionObj.text) {
                 questionText = questionObj.text;
@@ -275,29 +452,21 @@ function renderDiagnosisQuestions() {
             const questionP = document.createElement('p');
             questionP.className = 'mb-2 text-neutral-800';
             questionP.id = `question-${questionId}`;
-            
-            // 質問文に脚注番号を追加
             let displayText = `${index + 1}. ${questionText}`;
             if (questionFootnotes.length > 0) {
-                // 脚注番号を質問文内の特定語句の後に挿入
                 questionFootnotes.forEach((footnoteNum) => {
-                    // 脚注番号1の場合は「競プロ」の後に挿入
                     if (footnoteNum === 1) {
                         displayText = displayText.replace('競プロ', `競プロ<sup class="text-xs align-super">※${footnoteNum}</sup>`);
                     } else {
-                        // 他の脚注番号の場合は最後に追加
                         displayText += ` <sup class="text-xs align-super">※${footnoteNum}</sup>`;
                     }
                 });
-                // HTMLタグを含む場合はinnerHTMLを使用（ただし、data.jsの静的なデータのみ）
                 questionP.innerHTML = displayText;
             } else {
-                // HTMLタグがない場合はtextContentを使用
                 questionP.textContent = displayText;
             }
             questionDiv.appendChild(questionP);
 
-            // この質問に脚注がある場合、質問文の下に脚注説明を追加
             if (questionFootnotes.length > 0 && category.footnotes) {
                 const footnotesDiv = document.createElement('div');
                 footnotesDiv.className = 'text-xs text-neutral-600 mb-2 mt-1';
@@ -305,7 +474,6 @@ function renderDiagnosisQuestions() {
                     if (category.footnotes[footnoteNum]) {
                         const footnoteP = document.createElement('p');
                         footnoteP.className = 'mb-1';
-                        // data.jsの静的なデータなので、textContentで十分
                         footnoteP.textContent = `※${footnoteNum} ${category.footnotes[footnoteNum]}`;
                         footnotesDiv.appendChild(footnoteP);
                     }
@@ -317,16 +485,17 @@ function renderDiagnosisQuestions() {
             fieldset.className = 'mb-2';
             const legend = document.createElement('legend');
             legend.className = 'sr-only';
-            // legendには脚注番号を含まない元の質問文を使用
             legend.textContent = `${index + 1}. ${questionText}`;
             fieldset.appendChild(legend);
 
+            const saved = mobileAnswers[questionId];
             const yesInput = document.createElement('input');
             yesInput.type = 'radio';
             yesInput.id = `yes-${questionId}`;
             yesInput.name = `q-${questionId}`;
             yesInput.value = 'yes';
             yesInput.className = 'radio-input text-blue-500 focus:ring-blue-500';
+            yesInput.checked = saved === 'yes';
             yesInput.setAttribute('aria-labelledby', `question-${questionId} yes-label-${questionId}`);
             fieldset.appendChild(yesInput);
             const yesLabel = document.createElement('label');
@@ -342,6 +511,7 @@ function renderDiagnosisQuestions() {
             noInput.name = `q-${questionId}`;
             noInput.value = 'no';
             noInput.className = 'radio-input text-neutral-500 focus:ring-neutral-500';
+            noInput.checked = saved === 'no';
             noInput.setAttribute('aria-labelledby', `question-${questionId} no-label-${questionId}`);
             fieldset.appendChild(noInput);
             const noLabel = document.createElement('label');
@@ -358,32 +528,36 @@ function renderDiagnosisQuestions() {
     });
 }
 
-// 診断計算
+// 診断計算（モバイル時は mobileAnswers から集計）
 function calculateDiagnosis() {
     const userScores = { A1: 0, A2: 0, B: 0, C: 0, D: 0, E: 0 };
+    const categoryOrder = ['A1', 'A2', 'B', 'C', 'D', 'E'];
     let allAnswered = true;
 
-    // カテゴリの順序を定義（categoryLabelsの順序に合わせる）
-    const categoryOrder = ['A1', 'A2', 'B', 'C', 'D', 'E'];
-
-    Object.keys(diagnosisQuestions).forEach(categoryKey => {
-        diagnosisQuestions[categoryKey].questions.forEach((_, index) => {
-            const questionName = `q-${categoryKey}-${index}`;
-            const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
-            if (!selectedOption) {
-                allAnswered = false;
-            } else if (selectedOption.value === 'yes') {
-                userScores[categoryKey]++;
-            }
+    if (isMobile) {
+        Object.keys(diagnosisQuestions).forEach(categoryKey => {
+            diagnosisQuestions[categoryKey].questions.forEach((_, index) => {
+                const questionId = `${categoryKey}-${index}`;
+                const value = mobileAnswers[questionId];
+                if (value === undefined) allAnswered = false;
+                else if (value === 'yes') userScores[categoryKey]++;
+            });
         });
-    });
+    } else {
+        Object.keys(diagnosisQuestions).forEach(categoryKey => {
+            diagnosisQuestions[categoryKey].questions.forEach((_, index) => {
+                const questionName = `q-${categoryKey}-${index}`;
+                const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
+                if (!selectedOption) allAnswered = false;
+                else if (selectedOption.value === 'yes') userScores[categoryKey]++;
+            });
+        });
+    }
 
     if (!allAnswered) {
         showErrorMessage('全ての質問に回答してください。');
         return;
     }
-    
-    // エラーメッセージを非表示にする
     hideErrorMessage();
 
     displayUserScores(userScores, categoryOrder);
@@ -400,12 +574,26 @@ function calculateDiagnosis() {
 
 // 職種説明の表示
 function displayJobDescription(jobName) {
-    if (jobDescriptionDiv) {
-        if (jobDescriptions && jobDescriptions[jobName]) {
-            jobDescriptionDiv.textContent = jobDescriptions[jobName];
-            jobDescriptionDiv.classList.remove('hidden');
+    const fullText = jobDescriptions && jobDescriptions[jobName];
+    const separator = '【こんな方にお勧め】';
+    if (jobDescriptionDiv && jobRecommendationDiv && jobRecommendationText) {
+        if (fullText) {
+            if (fullText.includes(separator)) {
+                const parts = fullText.split(separator);
+                const description = parts[0].trim();
+                const recommendation = parts[1].trim();
+                jobDescriptionDiv.textContent = description;
+                jobDescriptionDiv.classList.remove('hidden');
+                jobRecommendationText.textContent = recommendation;
+                jobRecommendationDiv.classList.remove('hidden');
+            } else {
+                jobDescriptionDiv.textContent = fullText;
+                jobDescriptionDiv.classList.remove('hidden');
+                jobRecommendationDiv.classList.add('hidden');
+            }
         } else {
             jobDescriptionDiv.classList.add('hidden');
+            jobRecommendationDiv.classList.add('hidden');
         }
     }
 }
@@ -539,11 +727,16 @@ function hideErrorMessage() {
 
 // 診断のリセット
 function resetDiagnosis() {
+    mobileAnswers = {};
+    currentMobileQuestionIndex = 0;
     diagnosisForm.reset();
     diagnosisResultDiv.classList.add('hidden');
     hideErrorMessage();
     if (jobDescriptionDiv) {
         jobDescriptionDiv.classList.add('hidden');
+    }
+    if (jobRecommendationDiv) {
+        jobRecommendationDiv.classList.add('hidden');
     }
     if (jobIllustrationDiv) {
         jobIllustrationDiv.innerHTML = '<span class="text-neutral-500 text-sm">イラスト（仮置き）</span>';
@@ -553,6 +746,7 @@ function resetDiagnosis() {
         userProfileChartInstance.destroy();
         userProfileChartInstance = null;
     }
+    renderDiagnosisQuestions();
 }
 
 // 職種名からHTMLページのパスを取得
@@ -671,7 +865,26 @@ function shareToTwitter(e) {
 }
 
 // イベントリスナーの設定
+function showDiagnosisTool() {
+    if (!isMobile) return;
+    if (purposeSection) purposeSection.classList.add('hidden');
+    if (diagnosisToolSection) diagnosisToolSection.classList.remove('hidden');
+}
+
+function applyPurposeDiagnosisVisibility() {
+    if (isMobile) {
+        if (diagnosisToolSection) diagnosisToolSection.classList.add('hidden');
+        if (purposeSection) purposeSection.classList.remove('hidden');
+    } else {
+        if (diagnosisToolSection) diagnosisToolSection.classList.remove('hidden');
+        if (purposeSection) purposeSection.classList.remove('hidden');
+    }
+}
+
 function setupEventListeners() {
+    if (startDiagnosisButton) {
+        startDiagnosisButton.addEventListener('click', showDiagnosisTool);
+    }
     diagnoseButton.addEventListener('click', calculateDiagnosis);
     resetButton.addEventListener('click', resetDiagnosis);
     if (shareToTwitterButton) {
@@ -688,10 +901,9 @@ function setupEventListeners() {
 // 初期化関数
 function initialize() {
     initializeResponsive();
+    applyPurposeDiagnosisVisibility();
     setupEventListeners();
     renderDiagnosisQuestions();
-    // テスト用：診断結果を常に表示
-    displayTestResult();
 }
 
 // テスト用：診断結果を表示
