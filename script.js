@@ -201,7 +201,7 @@ const commonChartOptions = (titleText = '') => ({
                 family: "'Noto Sans JP', sans-serif", 
                 weight: 'bold' 
             },
-            color: '#1d4ed8'
+            color: '#4e4449'
         },
         tooltip: {
             callbacks: {
@@ -230,7 +230,6 @@ const commonChartOptions = (titleText = '') => ({
 // 診断フォーム関連
 const diagnosisForm = document.getElementById('diagnosisForm');
 const diagnoseButton = document.getElementById('diagnoseButton');
-const resetButton = document.getElementById('resetButton');
 const diagnosisResultDiv = document.getElementById('diagnosisResult');
 const userScoresList = document.getElementById('userScoresList');
 const recommendedJobSpan = document.getElementById('recommendedJob');
@@ -494,7 +493,7 @@ function renderDiagnosisQuestions() {
             yesInput.id = `yes-${questionId}`;
             yesInput.name = `q-${questionId}`;
             yesInput.value = 'yes';
-            yesInput.className = 'radio-input text-blue-500 focus:ring-blue-500';
+            yesInput.className = 'radio-input focus:ring-[#E0AE9E]';
             yesInput.checked = saved === 'yes';
             yesInput.setAttribute('aria-labelledby', `question-${questionId} yes-label-${questionId}`);
             fieldset.appendChild(yesInput);
@@ -528,6 +527,37 @@ function renderDiagnosisQuestions() {
     });
 }
 
+// 未回答の質問一覧を取得（表示用ラベル付き）
+function getUnansweredLabels() {
+    const categoryOrder = ['A1', 'A2', 'B', 'C', 'D', 'E'];
+    const lines = [];
+
+    categoryOrder.forEach(categoryKey => {
+        const category = diagnosisQuestions[categoryKey];
+        if (!category) return;
+        const unansweredInCategory = [];
+
+        category.questions.forEach((_, index) => {
+            let isAnswered = false;
+            if (isMobile) {
+                isAnswered = mobileAnswers[`${categoryKey}-${index}`] !== undefined;
+            } else {
+                isAnswered = !!document.querySelector(`input[name="q-${categoryKey}-${index}"]:checked`);
+            }
+            if (!isAnswered) unansweredInCategory.push(index + 1);
+        });
+
+        if (unansweredInCategory.length > 0) {
+            const nums = unansweredInCategory.length === 1
+                ? `${unansweredInCategory[0]}番`
+                : `${unansweredInCategory.join('・')}番`;
+            lines.push(`・${category.label} … ${nums}`);
+        }
+    });
+
+    return lines;
+}
+
 // 診断計算（モバイル時は mobileAnswers から集計）
 function calculateDiagnosis() {
     const userScores = { A1: 0, A2: 0, B: 0, C: 0, D: 0, E: 0 };
@@ -555,7 +585,9 @@ function calculateDiagnosis() {
     }
 
     if (!allAnswered) {
-        showErrorMessage('全ての質問に回答してください。');
+        const unansweredLines = getUnansweredLabels();
+        const message = '全ての質問に回答してください。\n\n未回答：\n' + unansweredLines.join('\n');
+        showErrorMessage(message);
         return;
     }
     hideErrorMessage();
@@ -667,12 +699,12 @@ function displayUserProfileChart(scores) {
                 label: 'あなたのスキルプロファイル',
                 data: scores,
                 fill: true,
-                backgroundColor: 'rgba(2, 132, 199, 0.2)',
-                borderColor: 'rgb(2, 132, 199)',
-                pointBackgroundColor: 'rgb(2, 132, 199)',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgb(2, 132, 199)'
+                backgroundColor: 'rgba(224, 174, 158, 0.35)',
+                borderColor: 'rgb(224, 174, 158)',
+                pointBackgroundColor: 'rgb(224, 174, 158)',
+                pointBorderColor: '#E0AE9E',
+                pointHoverBackgroundColor: '#E0AE9E',
+                pointHoverBorderColor: 'rgb(224, 174, 158)'
             }]
         },
         options: {
@@ -886,7 +918,6 @@ function setupEventListeners() {
         startDiagnosisButton.addEventListener('click', showDiagnosisTool);
     }
     diagnoseButton.addEventListener('click', calculateDiagnosis);
-    resetButton.addEventListener('click', resetDiagnosis);
     if (shareToTwitterButton) {
         shareToTwitterButton.addEventListener('click', shareToTwitter);
     }

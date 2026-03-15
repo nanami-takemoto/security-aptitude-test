@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="セキュリティ適職診断">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#1d4ed8">
+    <meta name="theme-color" content="#E0AE9E">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://x.com; frame-src https://x.com;">
     <title>セキュリティ適職診断</title>
     <!-- OGP / Twitter Card -->
@@ -31,7 +31,7 @@
 
     <nav class="sticky-nav shadow-md">
         <div class="container mx-auto px-6 py-3 flex justify-between items-center">
-            <div class="nav-brand text-xl font-semibold text-blue-500">セキュリティ職種診断</div>
+            <div class="nav-brand text-xl font-semibold">セキュリティ職種診断</div>
             <div class="space-x-4">
                 <a href="#purpose" class="nav-link">目的</a>
                 <a href="#diagnosis-tool" class="nav-link">診断を試す</a>
@@ -40,46 +40,43 @@
         </div>
     </nav>
 
-    <header class="header-banner bg-blue-100">
-        <img src="images/header.png" alt="セキュリティ適職診断" class="header-banner__img">
+    <header class="header-banner header-banner-bg">
+        <img src="images/header_2.png" alt="セキュリティ適職診断" class="header-banner__img">
     </header>
 
     <main class="container mx-auto px-6 py-8">
 
         <section id="purpose" class="section-card">
-            <h2 class="text-2xl font-bold mb-4">1. 診断の目的</h2>
+            <h2 class="text-2xl font-bold mb-4 heading-marker">1. 診断の目的</h2>
             <p class="mb-6">あなたの普段の興味関心と方向性が一致するセキュリティ職を診断し、セキュリティ業界に関心を持っていただくことを目的としています。</p>
             <button type="button" class="btn-primary start-diagnosis-btn" id="startDiagnosisButton">診断を始める</button>
         </section>
 
         <!-- Section: Take the Diagnosis -->
         <section id="diagnosis-tool" class="section-card app-card">
-            <h2 class="section-title">2. 診断を試す</h2>
+            <h2 class="section-title heading-marker">2. 診断を試す</h2>
             <form id="diagnosisForm" class="diagnosis-form" aria-label="セキュリティ適職診断フォーム">
                 <!-- Questions will be dynamically loaded here -->
             </form>
 
-            <div id="errorMessage" class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 hidden" role="alert" aria-live="polite">
+            <div id="errorMessage" class="error-message-box mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 hidden" role="alert" aria-live="polite">
                 <p class="font-semibold">エラー</p>
-                <p id="errorMessageText"></p>
+                <p id="errorMessageText" class="error-message-box__body"></p>
             </div>
 
             <div id="diagnosisButtonWrap" class="diagnosis-actions">
                 <button id="diagnoseButton" class="btn-primary" aria-label="全ての質問に回答後、診断を実行">
                     診断する
                 </button>
-                <button id="resetButton" class="btn-secondary" aria-label="診断フォームをリセット">
-                    リセット
-                </button>
             </div>
 
-            <div id="diagnosisResult" class="mt-8 p-6 bg-white rounded-lg shadow-inner border border-blue-200 hidden" role="region" aria-labelledby="diagnosisResultTitle" aria-live="polite">
-                <h3 id="diagnosisResultTitle" class="text-xl font-semibold mb-4 text-blue-500">あなたの診断結果</h3>
+            <div id="diagnosisResult" class="mt-8 p-6 diagnosis-result-block rounded-lg shadow-inner hidden" role="region" aria-labelledby="diagnosisResultTitle" aria-live="polite">
+                <h3 id="diagnosisResultTitle" class="text-xl font-semibold mb-4 diagnosis-result-title">あなたの診断結果</h3>
                 <p class="mb-4 text-neutral-700">あなたのスキルプロファイルと、最も適性が高いと診断された職種は以下の通りです。</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 grid-rows-2 gap-6">
                     <!-- 左上：おすすめの職種 + イラスト -->
                     <div class="row-span-1 flex flex-col job-result-head">
-                        <p class="text-xl font-bold text-neutral-800 mb-4">おすすめの職種: <span id="recommendedJob" class="text-blue-700 text-lg" aria-live="polite"></span></p>
+                        <p class="text-xl font-bold text-neutral-800 mb-4">おすすめの職種: <span id="recommendedJob" class="recommended-job-name text-lg" aria-live="polite"></span></p>
                         <div class="job-illustration-wrap flex items-center flex-1 min-h-0">
                             <div id="jobIllustration" class="job-illustration aspect-square border-2 border-neutral-400 bg-neutral-100 flex items-center justify-center mx-auto overflow-hidden">
                                 <span class="text-neutral-500 text-sm">イラスト（仮置き）</span>
@@ -113,8 +110,8 @@
                     </div>
                 </div>
                 <!-- 診断結果をSNSでシェアする -->
-                <div class="mt-8 p-6 rounded-xl bg-white border border-blue-200 shadow-sm share-result-block">
-                    <h4 class="text-lg font-bold text-blue-500 mb-4 flex items-center gap-2 share-result-block__title">
+                <div class="mt-8 p-6 rounded-xl share-result-block">
+                    <h4 class="text-lg font-bold mb-4 flex items-center gap-2 share-result-block__title">
                         <span class="text-xl" aria-hidden="true">📤</span>
                         診断結果をSNSでシェアする
                     </h4>
@@ -124,19 +121,19 @@
                             <span class="font-bold">X</span>
                             <span class="ml-2">診断結果をXに投稿する</span>
                         </a>
-                        <button type="button" id="copyResultButton" class="share-result-btn flex-1 min-w-[200px] py-4 px-6 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-bold text-lg transition duration-200 shadow-md" aria-label="診断結果をコピーで共有">
+                        <button type="button" id="copyResultButton" class="share-result-btn flex-1 min-w-[200px] py-4 px-6 rounded-xl copy-result-btn text-white font-bold text-lg transition duration-200 shadow-md" aria-label="診断結果をコピーで共有">
                             診断結果をコピーで共有
                         </button>
                     </div>
                     <!-- コピー内容のプレビュー -->
-                    <textarea id="shareTextPreview" class="w-full p-4 rounded-lg border border-blue-200 bg-blue-50/50 text-neutral-800 text-sm resize-y min-h-[80px] read-only focus:outline-none focus:ring-2 focus:ring-blue-400" readonly rows="4" aria-readonly="true"></textarea>
+                    <textarea id="shareTextPreview" class="w-full p-4 rounded-lg share-text-preview text-neutral-800 text-sm resize-y min-h-[80px] read-only focus:outline-none focus:ring-2 focus:ring-[#E0AE9E]" readonly rows="4" aria-readonly="true"></textarea>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="site-footer bg-neutral-800 text-neutral-300 py-8 text-center mt-12">
-        <p class="site-footer__text">&copy; 2025 LCL-Tokyo WG セキュリティ適職診断プロジェクトチーム</p>
+    <footer class="site-footer">
+        <p class="site-footer__text">&copy; 2025 LCL-Tokyo WG セキュリティブランディングチーム</p>
     </footer>
 
     <!-- Scripts -->

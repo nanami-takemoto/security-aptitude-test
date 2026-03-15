@@ -1,22 +1,62 @@
-/* ドットパターン（背景用） */
+/* カラーパレット */
 :root {
-    --dot-color: rgba(29, 78, 216, 0.12);
+    --color-main: #E0AE9E;
+    --color-accent: #4e4449;
+    --color-base: #E0AE9E;
+    --dot-color: rgba(224, 174, 158, 0.25);
     --dot-size: 2px;
     --dot-gap: 16px;
 }
 
 body {
     font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #fefce8;
+    background-color: var(--color-base);
     background-image:
-        radial-gradient(circle at center, var(--dot-color) var(--dot-size), transparent var(--dot-size)),
-        linear-gradient(160deg, #fefce8 0%, #fef9c3 50%, #fef08a 100%);
-    background-size: var(--dot-gap) var(--dot-gap), 100% 100%;
-    background-position: 0 0, 0 0;
-    background-attachment: fixed, fixed;
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 12px,
+            rgba(255, 249, 238, 0.25) 12px,
+            rgba(255, 249, 238, 0.25) 13px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 12px,
+            rgba(255, 249, 238, 0.15) 12px,
+            rgba(255, 249, 238, 0.15) 13px
+        );
+    background-size: 100% 100%;
+    background-position: 0 0;
+    background-attachment: fixed;
     color: #262626;
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
+}
+
+/* エラーメッセージ：改行を表示 */
+.error-message-box__body {
+    white-space: pre-line;
+    margin-top: 0.25rem;
+}
+
+/* ボタン・リンクはポインター（outline は削除しない） */
+a,
+button,
+[role="button"],
+input[type="submit"],
+input[type="button"] {
+    cursor: pointer;
+}
+
+/* フォーカス時は見やすい輪郭を表示 */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+input[type="submit"]:focus-visible,
+input[type="button"]:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
 }
 
 /* ユーティリティ */
@@ -27,11 +67,11 @@ body {
 /* アプリ風カード・セクション（ドット調） */
 .app-card {
     border-radius: 1.25rem;
-    box-shadow: 0 8px 32px rgba(29, 78, 216, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
-    border: 2px dotted rgba(29, 78, 216, 0.25);
-    background-image: radial-gradient(circle at 2px 2px, rgba(29, 78, 216, 0.06) 1px, transparent 1px);
+    box-shadow: 0 8px 32px rgba(78, 68, 73, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 2px dotted rgba(78, 68, 73, 0.2);
+    background-image: radial-gradient(circle at 2px 2px, rgba(224, 174, 158, 0.15) 1px, transparent 1px);
     background-size: 12px 12px;
-    background-color: #fff;
+    background-color: var(--color-base);
     overflow: hidden;
 }
 
@@ -39,7 +79,7 @@ body {
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 1rem;
-    color: #1d4ed8;
+    color: var(--color-accent);
     letter-spacing: -0.02em;
 }
 
@@ -61,6 +101,7 @@ body {
     flex-wrap: wrap;
     gap: 0.75rem;
     align-items: center;
+    justify-content: center;
 }
 
 .btn-primary,
@@ -76,21 +117,28 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    color: #fff;
-    border: 2px dotted rgba(255, 255, 255, 0.35);
-    box-shadow: 0 4px 14px rgba(29, 78, 216, 0.4);
+    background: linear-gradient(135deg, var(--color-main) 0%, #d09d8d 100%);
+    color: var(--color-accent);
+    border: 2px dotted rgba(78, 68, 73, 0.2);
+    box-shadow: 0 4px 14px rgba(224, 174, 158, 0.4);
 }
 
 .btn-primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(29, 78, 216, 0.45);
+    box-shadow: 0 6px 20px rgba(224, 174, 158, 0.5);
+}
+
+#diagnoseButton {
+    padding: 1rem 3.5rem;
+    font-size: 1.125rem;
+    min-height: 56px;
+    min-width: 280px;
 }
 
 .btn-secondary {
-    background: #f5f5f5;
-    color: #404040;
-    border: 2px dotted rgba(0, 0, 0, 0.12);
+    background: #f0eeea;
+    color: var(--color-accent);
+    border: 2px dotted rgba(78, 68, 73, 0.2);
 }
 
 .btn-secondary:hover {
@@ -129,13 +177,13 @@ body {
 
 .section-card {
     background-color: #fff;
-    background-image: radial-gradient(circle at 2px 2px, rgba(29, 78, 216, 0.05) 1px, transparent 1px);
+    background-image: radial-gradient(circle at 2px 2px, rgba(224, 174, 158, 0.08) 1px, transparent 1px);
     background-size: 14px 14px;
     border-radius: 0.75rem;
     padding: 1.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04);
     margin-bottom: 2rem;
-    border: 1px dotted rgba(29, 78, 216, 0.15);
+    border: 1px dotted rgba(78, 68, 73, 0.15);
 }
 
 /* ヘッダーバナー：幅100%・高さはアスペクト比維持 */
@@ -151,38 +199,86 @@ body {
     vertical-align: middle;
 }
 
+.header-banner-bg {
+    background-color: rgba(224, 174, 158, 0.25);
+}
+
+.nav-brand {
+    color: #FFF9EE;
+}
+
+.diagnosis-result-block {
+    background-color: var(--color-base);
+    border: 1px solid rgba(78, 68, 73, 0.15);
+}
+
+.diagnosis-result-title,
+.recommended-job-name {
+    color: var(--color-accent);
+}
+
+.share-result-block {
+    background-color: var(--color-base);
+    border: 1px solid rgba(78, 68, 73, 0.15);
+}
+
+.share-result-block__title {
+    color: var(--color-accent);
+}
+
+.copy-result-btn {
+    background: var(--color-main);
+    color: var(--color-accent);
+}
+
+.copy-result-btn:hover {
+    background: #d09d8d;
+    color: var(--color-accent);
+}
+
+.share-text-preview {
+    border: 1px solid rgba(78, 68, 73, 0.2);
+    background: rgba(224, 174, 158, 0.08);
+}
+
 .sticky-nav {
     position: sticky;
     top: 0;
     z-index: 50;
-    background-color: rgba(254, 252, 232, 0.92);
+    background-color: var(--color-accent);
     backdrop-filter: blur(10px);
-    border-bottom: 2px dotted rgba(29, 78, 216, 0.2);
+    border-bottom: 2px dotted rgba(255, 249, 238, 0.2);
 }
 
 .nav-link {
-    color: #2563eb; /* blue-600 明るめ */
+    color: #FFF9EE;
+    font-weight: 700;
     transition: color 0.3s ease;
 }
 
 .nav-link:hover {
-    color: #3b82f6; /* blue-500 さらに明るめ */
+    color: #fff;
 }
 
 h1, h2, h3 {
-    color: #1d4ed8; /* blue-700 */
+    color: var(--color-accent);
 }
 
-/* セクション見出し（診断の目的・診断を試す）は明るめの青 */
 .section-card > h2 {
-    color: #3b82f6; /* blue-500 明るめ */
+    color: var(--color-accent);
 }
 
-.accent-1 { color: #3b82f6; } /* blue-500 */
-.accent-2 { color: #65a30d; } /* lime-600 */
-.accent-3 { color: #0284c7; } /* sky-600 */
-.accent-4 { color: #8b5cf6; } /* violet-500 for D new */
-.accent-5 { color: #ec4899; } /* pink-500 for E new (from old E) */
+/* 見出しマーカー（蛍光ペン風） */
+.heading-marker {
+    display: inline-block;
+    background: linear-gradient(transparent 60%, #ffe9b9 60%);
+}
+
+.accent-1 { color: var(--color-main); }
+.accent-2 { color: #65a30d; }
+.accent-3 { color: #0284c7; }
+.accent-4 { color: #8b5cf6; }
+.accent-5 { color: #ec4899; }
 
 table {
     width: 100%;
@@ -207,15 +303,18 @@ th {
 .question-group {
     margin-bottom: 1.5rem;
     padding: 1rem;
-    background-image: radial-gradient(circle at 3px 3px, rgba(147, 197, 253, 0.3) 1.5px, transparent 1.5px);
-    background-size: 10px 10px;
-    background-color: #fefce8;
-    border-left: 4px dotted #93c5fd;
+    background-color: var(--color-base);
+    background-image:
+        radial-gradient(circle at center, rgba(255, 249, 238, 0.35) 2px, transparent 2px),
+        linear-gradient(160deg, var(--color-base) 0%, #e5b8a8 50%, #e9c2b4 100%);
+    background-size: 16px 16px, 100% 100%;
+    background-position: 0 0, 0 0;
+    border-left: 4px dotted var(--color-main);
     border-radius: 0.5rem;
 }
 
 .question-group h4 {
-    color: #3b82f6; /* blue-500 */
+    color: #FFF9EE;
     margin-bottom: 0.75rem;
     white-space: nowrap;
     overflow-x: auto;
@@ -234,8 +333,8 @@ sup {
     padding: 0.5rem;
     background-color: #fff;
     border-radius: 0.375rem;
-    border: 1px dotted rgba(59, 130, 246, 0.15);
-    box-shadow: 0 1px 2px 0 rgba(59, 130, 246, 0.08);
+    border: 1px dotted rgba(224, 174, 158, 0.3);
+    box-shadow: 0 1px 2px 0 rgba(78, 68, 73, 0.06);
 }
 
 .radio-label {
@@ -378,7 +477,7 @@ sup {
 /* タッチデバイス用の最適化 */
 @media (hover: none) and (pointer: coarse) {
     .nav-link:hover {
-        color: #1d4ed8; /* ホバー効果を無効化 */
+        color: #fff;
     }
     
     .radio-input,
@@ -407,7 +506,7 @@ sup {
         margin-left: -0.5rem;
         margin-right: -0.5rem;
         padding: 1.25rem 1rem;
-        box-shadow: 0 -2px 24px rgba(0, 0, 0, 0.06), 0 8px 32px rgba(29, 78, 216, 0.06);
+        box-shadow: 0 -2px 24px rgba(0, 0, 0, 0.06), 0 8px 32px rgba(224, 174, 158, 0.12);
     }
 
     .section-title {
@@ -430,7 +529,7 @@ sup {
 .mobile-quiz-progress-bar {
     height: 8px;
     background: transparent;
-    background-image: radial-gradient(circle at center, rgba(29, 78, 216, 0.25) 2px, transparent 2px);
+    background-image: radial-gradient(circle at center, rgba(78, 68, 73, 0.2) 2px, transparent 2px);
     background-size: 12px 8px;
     background-repeat: repeat-x;
     border-radius: 0;
@@ -441,7 +540,7 @@ sup {
 .mobile-quiz-progress-fill {
     height: 100%;
     background: transparent;
-    background-image: radial-gradient(circle at center, #1d4ed8 2.5px, transparent 2.5px);
+    background-image: radial-gradient(circle at center, var(--color-main) 2.5px, transparent 2.5px);
     background-size: 12px 8px;
     background-repeat: repeat-x;
     border-radius: 0;
@@ -456,13 +555,13 @@ sup {
 }
 
 .mobile-quiz-card {
-    background: #fff;
-    background-image: radial-gradient(circle at 3px 3px, rgba(29, 78, 216, 0.06) 1.5px, transparent 1.5px);
+    background: var(--color-base);
+    background-image: radial-gradient(circle at 3px 3px, rgba(224, 174, 158, 0.12) 1.5px, transparent 1.5px);
     background-size: 10px 10px;
     border-radius: 1.25rem;
     padding: 1.75rem 1.5rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(29, 78, 216, 0.08);
-    border: 2px dotted rgba(29, 78, 216, 0.35);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(78, 68, 73, 0.08);
+    border: 2px dotted rgba(78, 68, 73, 0.25);
     margin-bottom: 0.5rem;
 }
 
@@ -470,14 +569,14 @@ sup {
     display: inline-block;
     font-size: 0.6875rem;
     font-weight: 700;
-    color: #1d4ed8;
+    color: var(--color-accent);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     margin-bottom: 1rem;
     padding: 0.35rem 0.65rem;
-    background: rgba(29, 78, 216, 0.1);
+    background: rgba(224, 174, 158, 0.25);
     border-radius: 0.5rem;
-    border: 1px solid rgba(29, 78, 216, 0.2);
+    border: 1px solid rgba(78, 68, 73, 0.2);
 }
 
 .mobile-quiz-question {
@@ -558,17 +657,17 @@ sup {
 .mobile-quiz-done {
     text-align: center;
     padding: 2rem 1rem;
-    background-image: radial-gradient(circle at 4px 4px, rgba(59, 130, 246, 0.12) 2px, transparent 2px);
+    background-image: radial-gradient(circle at 4px 4px, rgba(224, 174, 158, 0.2) 2px, transparent 2px);
     background-size: 16px 16px;
-    background-color: rgba(254, 252, 232, 0.6);
+    background-color: rgba(224, 174, 158, 0.9);
     border-radius: 1.25rem;
-    border: 2px dotted rgba(59, 130, 246, 0.35);
+    border: 2px dotted rgba(224, 174, 158, 0.5);
 }
 
 .mobile-quiz-done-text {
     font-size: 1.125rem;
     font-weight: 700;
-    color: #1d4ed8;
+    color: var(--color-accent);
     margin-bottom: 0.5rem;
 }
 
@@ -725,10 +824,13 @@ sup {
     }
 }
 
-/* フッター：レスポンシブ */
+/* フッター：ナビと同じ色・レスポンシブ */
 .site-footer {
-    padding-left: 1rem;
-    padding-right: 1rem;
+    background-color: var(--color-accent);
+    color: #e7e5e4;
+    padding: 2rem 1rem;
+    margin-top: 3rem;
+    text-align: center;
 }
 
 .site-footer__text {
