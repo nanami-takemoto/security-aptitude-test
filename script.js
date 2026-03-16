@@ -234,12 +234,14 @@ const diagnosisResultDiv = document.getElementById('diagnosisResult');
 const userScoresList = document.getElementById('userScoresList');
 const recommendedJobSpan = document.getElementById('recommendedJob');
 const jobDescriptionDiv = document.getElementById('jobDescription');
+const jobDescriptionBody = document.getElementById('jobDescriptionBody');
 const jobRecommendationDiv = document.getElementById('jobRecommendation');
 const jobRecommendationText = document.getElementById('jobRecommendationText');
 const jobIllustrationDiv = document.getElementById('jobIllustration');
 const shareToTwitterButton = document.getElementById('shareToTwitterButton');
 const copyResultButton = document.getElementById('copyResultButton');
 const shareTextPreview = document.getElementById('shareTextPreview');
+const shareImagePreview = document.getElementById('shareImagePreview');
 const errorMessageDiv = document.getElementById('errorMessage');
 const errorMessageText = document.getElementById('errorMessageText');
 const diagnosisToolSection = document.getElementById('diagnosis-tool');
@@ -608,18 +610,18 @@ function calculateDiagnosis() {
 function displayJobDescription(jobName) {
     const fullText = jobDescriptions && jobDescriptions[jobName];
     const separator = '【こんな方にお勧め】';
-    if (jobDescriptionDiv && jobRecommendationDiv && jobRecommendationText) {
+    if (jobDescriptionDiv && jobDescriptionBody && jobRecommendationDiv && jobRecommendationText) {
         if (fullText) {
             if (fullText.includes(separator)) {
                 const parts = fullText.split(separator);
                 const description = parts[0].trim();
                 const recommendation = parts[1].trim();
-                jobDescriptionDiv.textContent = description;
+                jobDescriptionBody.textContent = description;
                 jobDescriptionDiv.classList.remove('hidden');
                 jobRecommendationText.textContent = recommendation;
                 jobRecommendationDiv.classList.remove('hidden');
             } else {
-                jobDescriptionDiv.textContent = fullText;
+                jobDescriptionBody.textContent = fullText;
                 jobDescriptionDiv.classList.remove('hidden');
                 jobRecommendationDiv.classList.add('hidden');
             }
@@ -723,7 +725,7 @@ function displayUserProfileChart(scores) {
                     },
                     ticks: {
                         stepSize: 1,
-                        backdropColor: 'rgba(255,250,240,0.5)',
+                        backdropColor: '#ffffff',
                         color: '#737373',
                         font: {
                             size: isMobile ? 8 : 10
@@ -784,17 +786,23 @@ function resetDiagnosis() {
 // 職種名からHTMLページのパスを取得
 function getJobPagePath(jobName) {
     const jobPageMap = {
-        "CEO": "ceo.html",
+        "セキュリティベンチャーCEO": "ceo.html",
         "CISO": "ciso.html",
-        "脆弱性診断士・ペネトレーションテスト": "penetration-test.html",
+        "脆弱性診断士・ペネトレーションテスター": "penetration-test.html",
         "SOC/CSIRT": "soc-csirt.html",
-        "Security Analysts": "security-analysts.html",
-        "フォレンジクス": "forensics.html",
+        "セキュリティアナリスト": "security-analysts.html",
+        "フォレンジックアナリスト": "forensics.html",
         "セキュリティーソリューション開発エンジニア": "security-engineer.html",
         "技術営業": "technical-sales.html",
         "セキュリティコンサルタント": "security-consultant.html"
     };
     return jobPageMap[jobName] || null;
+}
+
+// 職種名からシェア用OGP画像パスを取得（images/share/〇〇.png）
+function getShareImagePath(jobName) {
+    const path = getJobPagePath(jobName);
+    return path ? 'images/share/' + path.replace(/\.html$/, '.png') : '';
 }
 
 // 共有用URLのみ取得
@@ -809,9 +817,9 @@ function getShareUrl(jobName) {
 // 共有用テキストを取得（表示・コピー両方で使用）
 function getShareText(jobName) {
     if (!jobName) return '';
-    const text = `私におすすめの職種は${jobName}でした #セキュリティ適職診断`;
+    const text = `あなたにおすすめの職種は${jobName}です✨ #セキュリティ職種診断 #診断`;
     const url = getShareUrl(jobName);
-    return url ? `${text}\n\n${url}` : text;
+    return url ? `${text}\n詳細はこちら\n\n${url}` : text;
 }
 
 // 共有用テキストのプレビューを更新
@@ -819,6 +827,19 @@ function updateShareTextPreview(jobName) {
     var name = jobName || (recommendedJobSpan && recommendedJobSpan.textContent);
     if (shareTextPreview) {
         shareTextPreview.value = getShareText(name);
+    }
+    // シェア用画像プレビューを更新
+    if (shareImagePreview) {
+        var imgPath = getShareImagePath(name);
+        if (imgPath) {
+            shareImagePreview.src = imgPath;
+            shareImagePreview.alt = 'シェア時に表示される画像（' + name + '）';
+            shareImagePreview.classList.remove('hidden');
+        } else {
+            shareImagePreview.src = '';
+            shareImagePreview.alt = '';
+            shareImagePreview.classList.add('hidden');
+        }
     }
 }
 
@@ -890,9 +911,9 @@ function shareToTwitter(e) {
         alert('職種ページが見つかりません。');
         return;
     }
-    var text = '私におすすめの職種は' + jobName + 'でした #セキュリティ適職診断';
+    var text = 'あなたにおすすめの職種は' + jobName + 'です✨ #セキュリティ職種診断 #診断';
     var jobPageUrl = 'https://nanami-takemoto.github.io/security-aptitude-test/share/' + jobPagePath;
-    var tweetText = encodeURIComponent(text + '\n\n' + jobPageUrl);
+    var tweetText = encodeURIComponent(text + '\n▽ 詳細はこちら\n\n' + jobPageUrl);
     window.open('https://x.com/intent/tweet?text=' + tweetText, '_blank');
 }
 
@@ -944,7 +965,7 @@ function displayTestResult() {
     const testScores = { A1: 2, A2: 0, B: 1, C: 1, D: 4, E: 5 };
     const categoryOrder = ['A1', 'A2', 'B', 'C', 'D', 'E'];
     const scoresArray = categoryOrder.map(key => testScores[key]);
-    const recommendedJob = 'CEO';
+    const recommendedJob = 'セキュリティベンチャーCEO';
     
     displayUserScores(testScores, categoryOrder);
     recommendedJobSpan.textContent = recommendedJob;
