@@ -935,6 +935,8 @@ function initialize() {
     applyPurposeDiagnosisVisibility();
     setupEventListeners();
     renderDiagnosisQuestions();
+    // 確認用：診断結果を常時表示
+    displayTestResult();
 }
 
 // テスト用：診断結果を表示
