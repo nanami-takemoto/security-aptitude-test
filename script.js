@@ -819,7 +819,7 @@ function getShareText(jobName) {
     if (!jobName) return '';
     const text = `あなたにおすすめの職種は${jobName}です✨ #セキュリティ職種診断 #診断`;
     const url = getShareUrl(jobName);
-    return url ? `${text}\n詳細はこちら\n\n${url}` : text;
+    return url ? `${text}\n\n ▼ 詳細はこちら\n${url}` : text;
 }
 
 // 共有用テキストのプレビューを更新
@@ -913,7 +913,7 @@ function shareToTwitter(e) {
     }
     var text = 'あなたにおすすめの職種は' + jobName + 'です✨ #セキュリティ職種診断 #診断';
     var jobPageUrl = 'https://nanami-takemoto.github.io/security-aptitude-test/share/' + jobPagePath;
-    var tweetText = encodeURIComponent(text + '\n▽ 詳細はこちら\n\n' + jobPageUrl);
+    var tweetText = encodeURIComponent(text + '\n\n  ▼ 詳細はこちら\n' + jobPageUrl);
     window.open('https://x.com/intent/tweet?text=' + tweetText, '_blank');
 }
 
