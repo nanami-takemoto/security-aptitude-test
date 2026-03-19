@@ -48,6 +48,16 @@ input[type="button"]:focus-visible {
     display: none !important;
 }
 
+/* 画像の比率維持:
+   Tailwind の w-64 / h-64 で幅・高さが固定されるため、object-fit を指定して伸び縮みを防ぎます。 */
+img.w-64.h-64 {
+    width: min(48rem, 90vw); /* 約1.5倍サイズ（高さは画像比率に従う） */
+    height: auto !important; /* w-64/h-64 の固定高さで余白が出るのを防ぐ */
+    object-fit: contain;
+    object-position: center;
+    display: block;
+}
+
 /* アプリ風カード・セクション（ドット調） */
 .app-card {
     border-radius: 1.25rem;
@@ -117,6 +127,11 @@ input[type="button"]:focus-visible {
     font-size: 1.125rem;
     min-height: 56px;
     min-width: 280px;
+    color: #ffffff; /* 文字色：白 */
+}
+
+#diagnoseButton:hover {
+    color: #4e4449; /* ホバー時に文字色を濃いグレーへ */
 }
 
 .btn-secondary {
@@ -742,8 +757,12 @@ sup {
     }
 }
 
-/* Web版でも「診断を始める」ボタンを表示するため、
-   以前のデスクトップ非表示指定（min-width: 769px で display:none）は削除しました。 */
+/* Web版：診断を始めるボタンは非表示（モバイルのみ表示） */
+@media (min-width: 769px) {
+    .start-diagnosis-btn {
+        display: none !important;
+    }
+}
 
 /* 診断結果：職種説明をドットのメモ風に */
 .job-description-cute__title {
