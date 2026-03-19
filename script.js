@@ -4,15 +4,19 @@ let isTablet = false;
 
 // デバイス検出関数
 function detectDevice() {
+    // プレビュー用: URL に ?preview=mobile を付けるとスマホ表示でプレビュー
+    const params = new URLSearchParams(window.location.search);
+    const forceMobilePreview = params.get('preview') === 'mobile';
+
     const userAgent = navigator.userAgent.toLowerCase();
     const screenWidth = window.innerWidth;
-    
-    // モバイルデバイスの検出
-    isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent) || screenWidth <= 768;
-    
-    // タブレットの検出
-    isTablet = screenWidth > 768 && screenWidth <= 1024;
-    
+
+    // モバイルデバイスの検出（プレビュー時は強制モバイル）
+    isMobile = forceMobilePreview || /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent) || screenWidth <= 768;
+
+    // タブレットの検出（プレビュー時はモバイル扱いのためタブレットにしない）
+    isTablet = !forceMobilePreview && screenWidth > 768 && screenWidth <= 1024;
+
     // デバイスに応じたクラスをbodyに追加
     document.body.classList.remove('mobile-device', 'tablet-device', 'desktop-device');
     if (isMobile) {
@@ -91,9 +95,28 @@ function optimizeMobileButtons() {
     });
 }
 
+// ヘッダー画像をデバイスに応じて切り替える
+function updateHeaderImage() {
+    const headerImg =
+        document.querySelector('#headerImage') ||
+        document.querySelector('.header-banner__img');
+    if (!headerImg) return;
+
+    const mobileSrc = 'images/header.png';
+    const desktopSrc = 'images/header_web.png';
+
+    // "desktop-device" の時だけ Web 用ヘッダーにする
+    if (document.body.classList.contains('desktop-device')) {
+        headerImg.src = desktopSrc;
+    } else {
+        headerImg.src = mobileSrc;
+    }
+}
+
 // レスポンシブ対応の初期化
 function initializeResponsive() {
     detectDevice();
+    updateHeaderImage();
     optimizeMobileNavigation();
     optimizeMobileCharts();
     optimizeMobileForm();

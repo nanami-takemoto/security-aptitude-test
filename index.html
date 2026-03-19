@@ -31,7 +31,7 @@
 
     <nav class="sticky-nav shadow-md">
         <div class="container mx-auto px-6 py-3 flex justify-between items-center">
-            <div class="nav-brand text-xl font-semibold">セキュリティ職種診断</div>
+            <a href="index.html" class="nav-brand text-xl font-semibold">セキュリティ職種診断</a>
             <div class="space-x-4">
                 <a href="#purpose" class="nav-link">目的</a>
                 <a href="#diagnosis-tool" class="nav-link">診断を試す</a>
@@ -41,7 +41,15 @@
     </nav>
 
     <header class="header-banner header-banner-bg">
-        <img src="images/header_2.png" alt="セキュリティ職種診断" class="header-banner__img">
+        <picture>
+            <source media="(min-width: 769px)" srcset="images/header_web.png">
+            <img
+                id="headerImage"
+                src="images/header.png"
+                alt="セキュリティ職種診断"
+                class="header-banner__img"
+            >
+        </picture>
     </header>
 
     <main class="container mx-auto px-6 py-8">
@@ -133,6 +141,13 @@
                         <img id="shareImagePreview" src="" alt="" class="share-image-preview hidden" width="220" height="220">
                         <textarea id="shareTextPreview" class="share-text-preview share-preview-box__text text-neutral-800 text-sm resize-y min-h-[80px] read-only focus:outline-none focus:ring-2 focus:ring-[#E0AE9E]" readonly rows="4" aria-readonly="true"></textarea>
                     </div>
+                </div>
+                <!-- 職種一覧へのリンク -->
+                <div class="mt-6 job-list-link-block">
+                    <a href="jobs.html" class="job-list-link-btn inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-center transition duration-200" target="_blank" rel="noopener noreferrer">
+                        <span class="text-xl" aria-hidden="true">👀</span>
+                        <span>すべての職種一覧を見る</span>
+                    </a>
                 </div>
             </div>
         </section>

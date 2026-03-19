@@ -191,6 +191,7 @@ input[type="button"]:focus-visible {
 
 .nav-brand {
     color: #FFF9EE;
+    text-decoration: none;
 }
 
 .diagnosis-result-block {
@@ -217,6 +218,23 @@ input[type="button"]:focus-visible {
 .share-result-block {
     background-color: rgba(255, 249, 238, 0.8);
     border: 1px solid rgba(224, 174, 158, 0.35);
+}
+
+.job-list-link-block {
+    margin-top: 1.5rem;
+    text-align: right;
+}
+
+.job-list-link-btn {
+    background: var(--color-main);
+    color: #ffffff;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(78, 68, 73, 0.12);
+}
+
+.job-list-link-btn:hover {
+    background: #d09d8d;
+    color: var(--color-accent);
 }
 
 .share-result-block__title {
@@ -590,7 +608,7 @@ sup {
 }
 
 .mobile-quiz-card {
-    background: var(--color-base);
+    background: #FFF9EE; /* オフホワイト */
     background-image: radial-gradient(circle at 3px 3px, rgba(224, 174, 158, 0.12) 1.5px, transparent 1.5px);
     background-size: 10px 10px;
     border-radius: 1.25rem;
@@ -724,12 +742,8 @@ sup {
     }
 }
 
-/* Web版：診断を始めるボタンは非表示（モバイルのみ表示） */
-@media (min-width: 769px) {
-    .start-diagnosis-btn {
-        display: none !important;
-    }
-}
+/* Web版でも「診断を始める」ボタンを表示するため、
+   以前のデスクトップ非表示指定（min-width: 769px で display:none）は削除しました。 */
 
 /* 診断結果：職種説明をドットのメモ風に */
 .job-description-cute__title {
