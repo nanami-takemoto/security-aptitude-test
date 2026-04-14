@@ -95,22 +95,14 @@ function optimizeMobileButtons() {
     });
 }
 
-// ヘッダー画像をデバイスに応じて切り替える
+// ヘッダー画像（PC/モバイル共通）
 function updateHeaderImage() {
     const headerImg =
         document.querySelector('#headerImage') ||
         document.querySelector('.header-banner__img');
     if (!headerImg) return;
 
-    const mobileSrc = 'images/header.png';
-    const desktopSrc = 'images/header_web.png';
-
-    // "desktop-device" の時だけ Web 用ヘッダーにする
-    if (document.body.classList.contains('desktop-device')) {
-        headerImg.src = desktopSrc;
-    } else {
-        headerImg.src = mobileSrc;
-    }
+    headerImg.src = 'images/header_3.png';
 }
 
 // レスポンシブ対応の初期化
