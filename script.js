@@ -971,24 +971,6 @@ function initialize() {
     applyPurposeDiagnosisVisibility();
     setupEventListeners();
     renderDiagnosisQuestions();
-    // 確認用：診断結果を常時表示
-    displayTestResult();
-}
-
-// テスト用：診断結果を表示
-function displayTestResult() {
-    const testScores = { A1: 2, A2: 0, B: 1, C: 1, D: 4, E: 5 };
-    const categoryOrder = ['A1', 'A2', 'B', 'C', 'D', 'E'];
-    const scoresArray = categoryOrder.map(key => testScores[key]);
-    const recommendedJob = 'セキュリティベンチャーCEO';
-    
-    displayUserScores(testScores, categoryOrder);
-    recommendedJobSpan.textContent = recommendedJob;
-    displayJobDescription(recommendedJob);
-    displayJobIllustration(recommendedJob);
-    displayUserProfileChart(scoresArray);
-    updateShareTextPreview(recommendedJob);
-    diagnosisResultDiv.classList.remove('hidden');
 }
 
 // DOMContentLoadedイベントで初期化
