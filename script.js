@@ -102,7 +102,7 @@ function updateHeaderImage() {
         document.querySelector('.header-banner__img');
     if (!headerImg) return;
 
-    headerImg.src = 'images/header_3.png';
+    headerImg.src = 'images/header.png';
 }
 
 // レスポンシブ対応の初期化
